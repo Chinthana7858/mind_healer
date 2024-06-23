@@ -2,16 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:newproject/const/colors.dart';
+import 'package:newproject/pages/make_appointment.dart';
 import 'package:newproject/service/FirestoreService.dart';
 
-class HomePage extends StatefulWidget {
-  HomePage({super.key});
+class UserHomePage extends StatefulWidget {
+  const UserHomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _UserHomePageState createState() => _UserHomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _UserHomePageState extends State<UserHomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirestoreService _firestoreService = FirestoreService();
   final TextEditingController _searchController = TextEditingController();
@@ -39,6 +40,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -141,16 +143,63 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         final userData =
                             users[index].data() as Map<String, dynamic>;
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(
-                                userData['profilePicture'] ??
-                                    'https://via.placeholder.com/150'),
-                          ),
-                          title: Text(userData['name'] ?? 'Name not available'),
-                          subtitle:
-                              Text(userData['email'] ?? 'Email not available'),
-                        );
+                        return Container(
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 0),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16.0),
+                              tileColor: Colors
+                                  .grey[200], // Background color for the tile
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: Image.network(
+                                    userData['profilePicture'] ??
+                                        'https://via.placeholder.com/150',
+                                    width: screenWidth,
+                                    height: screenWidth,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              title: Text(
+                                userData['name'] != null
+                                    ? 'DR. ${userData['name']}'
+                                    : 'Name not available',
+                              ),
+                              subtitle: Text(userData['qualification'] ?? ''),
+                              trailing: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => MakeAppointment(
+                                              psychiatristId: userData['userId']
+                                                  .toString())),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primegreen,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  child: const Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.double_arrow,
+                                        size: 20,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  )),
+                            ));
                       },
                     );
                   },

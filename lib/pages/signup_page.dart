@@ -5,9 +5,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:newproject/bottom_nav_bar.dart';
+import 'package:newproject/psychiatrist_bottom_nav_bar.dart';
 import 'package:newproject/const/colors.dart';
 import 'package:newproject/const/styles.dart';
+import 'package:newproject/user_bottom_nav_bar.dart';
+import 'package:image/image.dart' as img;
 
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key); // Corrected the key parameter
@@ -76,6 +78,7 @@ class _SignupPageState extends State<SignupPage> {
         'userType': _isPsychiatrist ? 'psychiatrist' : 'user',
         'createdAt': FieldValue.serverTimestamp(),
         'dateOfBirth': _dobController.text,
+        'userId': userCredential.user!.uid,
       };
 
       if (_isPsychiatrist) {
@@ -98,10 +101,20 @@ class _SignupPageState extends State<SignupPage> {
 
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Signup successful!')));
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => BottomBar(selectedIndex: 0)),
-      );
+      final userType = await _getUserType(userCredential.user!.uid);
+      if (userType == 'psychiatrist') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const PsyBottomBar(selectedIndex: 0)),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const UserBottomBar(selectedIndex: 0)),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       String message;
       if (e.code == 'weak-password') {
@@ -128,10 +141,28 @@ class _SignupPageState extends State<SignupPage> {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
+      // Resize the image using the image package
+      File pickedImage = File(pickedFile.path);
+      final File resizedImage = await _resizeImage(pickedImage);
+
       setState(() {
-        _image = File(pickedFile.path);
+        _image = resizedImage;
       });
     }
+  }
+
+  Future<File> _resizeImage(File pickedImage) async {
+    // Read the file and decode it to Image object
+    img.Image image = img.decodeImage(await pickedImage.readAsBytes())!;
+
+    // Resize the image to 300x300 pixels
+    img.Image resizedImage = img.copyResize(image, width: 300);
+
+    // Save resized image to a temporary file
+    File resizedFile = File(pickedImage.path)
+      ..writeAsBytesSync(img.encodeJpg(resizedImage, quality: 85));
+
+    return resizedFile;
   }
 
   Future<String> uploadProfilePicture(String userId) async {
@@ -141,36 +172,34 @@ class _SignupPageState extends State<SignupPage> {
           .ref()
           .child('profile_pictures')
           .child('$userId.jpg');
-      print("Debug: Starting file upload");
 
       UploadTask uploadTask = storageReference.putFile(_image!);
-      print("Debug: UploadTask created");
-
-      uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
-        print('Task state: ${snapshot.state}');
-        print(
-            'Progress: ${(snapshot.bytesTransferred / snapshot.totalBytes) * 100} %');
-      }, onError: (e) {
-        print('Error in snapshotEvents: $e');
-      });
 
       await uploadTask.whenComplete(() async {
-        try {
-          print("Debug: UploadTask completed");
-          imageUrl = await storageReference.getDownloadURL();
-          print("Debug: Download URL retrieved");
-        } catch (e) {
-          print('Error getting download URL: $e');
-        }
-        // ignore: body_might_complete_normally_catch_error
-      }).catchError((e) {
-        print('Error in whenComplete: $e');
+        imageUrl = await storageReference.getDownloadURL();
       });
     } catch (e) {
       print('Error uploading profile picture: $e');
     }
-    print("Final imageUrl: $imageUrl");
     return imageUrl;
+  }
+
+  Future<String?> _getUserType(String uid) async {
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    if (userDoc.exists) {
+      return userDoc['userType'];
+    }
+
+    final psychiatristDoc = await FirebaseFirestore.instance
+        .collection('psychiatrists')
+        .doc(uid)
+        .get();
+    if (psychiatristDoc.exists) {
+      return psychiatristDoc['userType'];
+    }
+
+    return null;
   }
 
   @override
@@ -334,7 +363,7 @@ class _SignupPageState extends State<SignupPage> {
               ),
               if (_isPsychiatrist) ...[
                 const Text(
-                  'Enter your qualifications here(ex: Bsc (Hons)',
+                  'Enter your qualifications here(ex: Bsc (Hons))',
                   style: TextStyle(color: primegreen),
                 ),
                 SizedBox(
@@ -344,7 +373,7 @@ class _SignupPageState extends State<SignupPage> {
                   controller: _qualificationController,
                   labelText: 'Qualifications',
                   icon: Icons.school,
-                  obscureText: true,
+                  obscureText: false,
                 ),
               ] else
                 ...[],
