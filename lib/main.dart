@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:newproject/pages/home_page.dart';
+import 'package:newproject/pages/user/user_home_page.dart';
 import 'package:newproject/pages/signin_page.dart';
 import 'package:newproject/pages/signup_page.dart';
 import 'package:newproject/splash_screen.dart';
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const SplashScreen(),
         '/signin': (context) => const SigninPage(),
-        '/homepage': (context) => HomePage(),
+        '/userhomepage': (context) => UserHomePage(),
         '/signuppage': (context) => const SignupPage(),
         '/signinpage': (context) => const SigninPage(),
       },

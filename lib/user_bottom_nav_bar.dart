@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:newproject/const/colors.dart';
-import 'package:newproject/pages/home_page.dart';
-import 'package:newproject/pages/user_list_page.dart';
+import 'package:newproject/pages/user/user_home_page.dart';
+import 'package:newproject/pages/user/user_appointments.dart';
 
-class BottomBar extends StatefulWidget {
-  const BottomBar({super.key, required this.selectedIndex});
+class UserBottomBar extends StatefulWidget {
+  const UserBottomBar({super.key, required this.selectedIndex});
 
   final int selectedIndex;
 
   @override
-  State<BottomBar> createState() => _BottomBarState();
+  State<UserBottomBar> createState() => _UserBottomBarState();
 }
 
-class _BottomBarState extends State<BottomBar> {
+class _UserBottomBarState extends State<UserBottomBar> {
   late int _selectedIndex;
 
   @override
@@ -74,9 +74,9 @@ class _BottomBarState extends State<BottomBar> {
   Widget _getPage(int index) {
     switch (index) {
       case 0:
-        return HomePage();
+        return UserHomePage();
       case 1:
-        return UserList();
+        return UserAppointments();
       default:
         return Container();
     }
