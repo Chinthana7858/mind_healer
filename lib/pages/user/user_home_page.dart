@@ -1,8 +1,13 @@
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:newproject/const/colors.dart';
-import 'package:newproject/pages/make_appointment.dart';
+import 'package:newproject/const/styles.dart';
+import 'package:newproject/pages/chatbot/chat.dart';
+import 'package:newproject/pages/user/make_appointment.dart';
+import 'package:newproject/pages/user/psychiatrist_profile.dart';
 import 'package:newproject/service/FirestoreService.dart';
 
 class UserHomePage extends StatefulWidget {
@@ -43,40 +48,38 @@ class _UserHomePageState extends State<UserHomePage> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-          child: user != null
-              ? FutureBuilder<Map<String, dynamic>?>(
-                  future: _firestoreService.getUserData(user.uid),
-                  builder:
-                      (context, AsyncSnapshot<Map<String, dynamic>?> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
+        title: user != null
+            ? FutureBuilder<Map<String, dynamic>?>(
+                future: _firestoreService.getUserData(user.uid),
+                builder:
+                    (context, AsyncSnapshot<Map<String, dynamic>?> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
 
-                    if (snapshot.hasError) {
-                      return const Text('Error fetching user data');
-                    }
+                  if (snapshot.hasError) {
+                    return const Text('Error fetching user data');
+                  }
 
-                    final userData = snapshot.data;
+                  final userData = snapshot.data;
 
-                    if (userData == null || !userData.containsKey('name')) {
-                      return const Text(
-                          'User data not found or name not available',
-                          style: TextStyle(fontSize: 18));
-                    }
+                  if (userData == null || !userData.containsKey('name')) {
+                    return const Text(
+                        'User data not found or name not available',
+                        style: TextStyle(fontSize: 18));
+                  }
 
-                    final userName = userData['name'] as String;
+                  final userName = userData['name'] as String;
 
-                    return Text('Hi, $userName',
-                        style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: primegreen));
-                  },
-                )
-              : const Text('No user is currently signed in',
-                  style: TextStyle(fontSize: 18)),
-        ),
+                  return Text('Hi, $userName',
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: primegreen));
+                },
+              )
+            : const Text('No user is currently signed in',
+                style: TextStyle(fontSize: 18)),
         actions: [
           IconButton(
             onPressed: () => _signout(context),
@@ -89,137 +92,290 @@ class _UserHomePageState extends State<UserHomePage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              TextField(
+              SearchTextField(
                 controller: _searchController,
-                decoration: InputDecoration(
-                  labelText: 'Search Psychiatrists',
-                  labelStyle: const TextStyle(
-                    color: primegreen,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(
-                      Icons.search,
-                      color: primegreen,
-                    ),
-                    onPressed: _search,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: const BorderSide(
-                      color: primegreen,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: const BorderSide(
-                      color: Colors.green,
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 15.0,
-                    horizontal: 20.0,
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
+                labelText: 'Search Psychiatrists',
+                onPressed: _search,
+              ),
+              const SizedBox(height: 16),
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        primegreen,
+                        Colors.teal,
+                      ]),
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
                 ),
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.black,
+                child: Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 16.0, left: 16.0),
+                          child: Text("Hi! You Can Ask Me",
+                              style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 16.0),
+                          child: Text("Anything",
+                              style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: 8.0, left: 16.0, bottom: 16.0),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const ChatPage()),
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white),
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.black),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              child: GradientText(
+                                "Ask Now",
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                gradient: LinearGradient(colors: [
+                                  Colors.teal,
+                                  primegreen,
+                                ]),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
               if (_searchResults.isEmpty)
-                StreamBuilder<QuerySnapshot>(
-                  stream: _firestoreService.getPsychiatrists(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    final users = snapshot.data!.docs;
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: users.length,
-                      itemBuilder: (context, index) {
-                        final userData =
-                            users[index].data() as Map<String, dynamic>;
-                        return Container(
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 0),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 8.0, horizontal: 16.0),
-                              tileColor: Colors
-                                  .grey[200], // Background color for the tile
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Image.network(
-                                    userData['profilePicture'] ??
-                                        'https://via.placeholder.com/150',
-                                    width: screenWidth,
-                                    height: screenWidth,
-                                    fit: BoxFit.cover,
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Specialists",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: primegreen,
+                          ),
+                        ),
+                      ),
+                      StreamBuilder<QuerySnapshot>(
+                        stream: _firestoreService.getSpecialistPsychiatrists(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          final users = snapshot.data!.docs;
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: users.length,
+                            itemBuilder: (context, index) {
+                              final userData =
+                                  users[index].data() as Map<String, dynamic>;
+                              return Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 0),
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 8.0, horizontal: 16.0),
+                                  tileColor: Colors.grey[200],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
                                   ),
-                                ),
-                              ),
-                              title: Text(
-                                userData['name'] != null
-                                    ? 'DR. ${userData['name']}'
-                                    : 'Name not available',
-                              ),
-                              subtitle: Text(userData['qualification'] ?? ''),
-                              trailing: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => MakeAppointment(
-                                              psychiatristId: userData['userId']
-                                                  .toString())),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: primegreen,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: AspectRatio(
+                                      aspectRatio: 1,
+                                      child: Image.network(
+                                        userData['profilePicture'] ??
+                                            'https://via.placeholder.com/150',
+                                        width: screenWidth,
+                                        height: screenWidth,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
-                                  child: const Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.double_arrow,
-                                        size: 20,
-                                        color: Colors.white,
+                                  title: Text(
+                                    userData['name'] != null
+                                        ? 'DR. ${userData['name']}'
+                                        : 'Name not available',
+                                  ),
+                                  subtitle:
+                                      Text(userData['qualification'] ?? ''),
+                                  trailing: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PsychiatristProfile(
+                                                    psychiatristId:
+                                                        userData['userId']
+                                                            .toString())),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: primegreen,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
                                       ),
-                                    ],
-                                  )),
-                            ));
-                      },
-                    );
-                  },
+                                    ),
+                                    child: const Icon(
+                                      Icons.double_arrow,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Psychiatrists",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: primegreen,
+                          ),
+                        ),
+                      ),
+                      StreamBuilder<QuerySnapshot>(
+                        stream:
+                            _firestoreService.getNonSpecialistPsychiatrists(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          final users = snapshot.data!.docs;
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: users.length,
+                            itemBuilder: (context, index) {
+                              final userData =
+                                  users[index].data() as Map<String, dynamic>;
+                              return Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 0),
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 8.0, horizontal: 16.0),
+                                  tileColor: Colors.grey[200],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: AspectRatio(
+                                      aspectRatio: 1,
+                                      child: Image.network(
+                                        userData['profilePicture'] ??
+                                            'https://via.placeholder.com/150',
+                                        width: screenWidth,
+                                        height: screenWidth,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  title: Text(
+                                    userData['name'] != null
+                                        ? 'DR. ${userData['name']}'
+                                        : 'Name not available',
+                                  ),
+                                  subtitle:
+                                      Text(userData['qualification'] ?? ''),
+                                  trailing: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PsychiatristProfile(
+                                                    psychiatristId:
+                                                        userData['userId']
+                                                            .toString())),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: primegreen,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                      Icons.double_arrow,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      )
+                    ],
+                  ),
                 )
               else
                 ListView.builder(
                   shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: _searchResults.length,
                   itemBuilder: (context, index) {
                     final userData =
                         _searchResults[index].data() as Map<String, dynamic>;
                     return ListTile(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PsychiatristProfile(
+                                  psychiatristId: userData['userId'])),
+                        );
+                      },
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(
                             userData['profilePicture'] ??
                                 'https://via.placeholder.com/150'),
                       ),
                       title: Text(userData['name'] ?? 'Name not available'),
-                      subtitle:
-                          Text(userData['email'] ?? 'Email not available'),
+                      subtitle: Text(userData['qualification'] ??
+                          'Qualification not available'),
                     );
                   },
                 ),

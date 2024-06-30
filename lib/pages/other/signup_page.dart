@@ -5,10 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:newproject/psychiatrist_bottom_nav_bar.dart';
+import 'package:newproject/pages/psychiatrist/psychiatrist_bottom_nav_bar.dart';
 import 'package:newproject/const/colors.dart';
 import 'package:newproject/const/styles.dart';
-import 'package:newproject/user_bottom_nav_bar.dart';
+import 'package:newproject/pages/user/user_bottom_nav_bar.dart';
 import 'package:image/image.dart' as img;
 
 class SignupPage extends StatefulWidget {
@@ -28,9 +28,11 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _qualificationController =
       TextEditingController();
   final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _specialityController = TextEditingController();
 
   String _gender = 'Male';
-  bool _isPsychiatrist = false; // Switch state for psychiatrist
+  bool _isPsychiatrist = false;
+  bool _isSpecialist = false;
   bool _isLoading = false;
   File? _image;
 
@@ -73,6 +75,7 @@ class _SignupPageState extends State<SignupPage> {
       Map<String, dynamic> userData = {
         'email': _emailController.text,
         'name': _nameController.text,
+        'lowercasename': _nameController.text.toLowerCase(),
         'phone': _phoneController.text,
         'gender': _gender,
         'userType': _isPsychiatrist ? 'psychiatrist' : 'user',
@@ -83,6 +86,10 @@ class _SignupPageState extends State<SignupPage> {
 
       if (_isPsychiatrist) {
         userData['qualification'] = _qualificationController.text;
+        userData['specialist'] = _isSpecialist ? 'true' : 'false';
+        if (_isSpecialist) {
+          userData['speciality'] = _specialityController.text;
+        }
       }
       print("trying2");
       // Upload profile picture if selected
@@ -375,6 +382,42 @@ class _SignupPageState extends State<SignupPage> {
                   icon: Icons.school,
                   obscureText: false,
                 ),
+                SizedBox(
+                  height: screenHeight * 0.01,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'I am a specialist',
+                      style: TextStyle(color: primegreen),
+                    ),
+                    Switch(
+                      value: _isSpecialist,
+                      onChanged: (bool value) {
+                        setState(() {
+                          _isSpecialist = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                if (_isSpecialist) ...[
+                  const Text(
+                    'Enter your speciality',
+                    style: TextStyle(color: primegreen),
+                  ),
+                  SizedBox(
+                    height: screenHeight * 0.01,
+                  ),
+                  CustomTextField(
+                    controller: _specialityController,
+                    labelText: 'Speciality',
+                    icon: Icons.local_hospital,
+                    obscureText: false,
+                  ),
+                ] else
+                  ...[]
               ] else
                 ...[],
               const SizedBox(height: 20),
@@ -411,12 +454,12 @@ class _SignupPageState extends State<SignupPage> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      Text(
+                      const Text(
                         'Sign Up',
                         style: TextStyle(fontWeight: FontWeight.w400),
                       ),
                       if (_isLoading)
-                        CircularProgressIndicator(
+                        const CircularProgressIndicator(
                           valueColor:
                               AlwaysStoppedAnimation<Color>(Colors.white),
                         ),

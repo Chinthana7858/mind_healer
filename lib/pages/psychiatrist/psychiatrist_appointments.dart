@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,7 +29,7 @@ class _PsychiatristAppointmentsState extends State<PsychiatristAppointments> {
           .snapshots();
     } else {
       // Handle the case where the user is not logged in
-      _appointmentsStream = Stream.empty();
+      _appointmentsStream = const Stream.empty();
     }
   }
 
@@ -103,12 +105,12 @@ class _PsychiatristAppointmentsState extends State<PsychiatristAppointments> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.check, color: Colors.green),
+                        icon: const Icon(Icons.check, color: Colors.green),
                         onPressed: () =>
                             _updateAppointmentStatus(appointment.id, true),
                       ),
                       IconButton(
-                        icon: Icon(Icons.close, color: Colors.red),
+                        icon: const Icon(Icons.close, color: Colors.red),
                         onPressed: () =>
                             _updateAppointmentStatus(appointment.id, false),
                       ),

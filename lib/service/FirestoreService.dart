@@ -37,17 +37,66 @@ class FirestoreService {
     return _firestore.collection('psychiatrists').snapshots();
   }
 
+  Stream<QuerySnapshot> getSpecialistPsychiatrists() {
+    return _firestore
+        .collection('psychiatrists')
+        .where('specialist', isEqualTo: 'true')
+        .snapshots();
+  }
+    Stream<QuerySnapshot> getNonSpecialistPsychiatrists() {
+    return _firestore
+        .collection('psychiatrists')
+        .where('specialist', isEqualTo: 'false')
+        .snapshots();
+  }
+
   Future<List<QueryDocumentSnapshot>> searchPsychiatrists(String query) async {
     try {
       final QuerySnapshot result = await _firestore
           .collection('psychiatrists')
-          .where('name', isGreaterThanOrEqualTo: query)
-          .where('name', isLessThanOrEqualTo: query + '\uf8ff')
+          .where('lowercasename', isGreaterThanOrEqualTo: query.toLowerCase())
+          .where('lowercasename',
+              isLessThanOrEqualTo: query.toLowerCase() + '\uf8ff')
           .get();
+      print("result");
+      print(result.docs);
       return result.docs;
     } catch (e) {
       print('Error searching psychiatrists: $e');
       return [];
     }
+  }
+
+   Future<void> addFavoritePsychiatrist(String userId, String psychiatristId) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'favoritePsychiatrists': FieldValue.arrayUnion([psychiatristId])
+      });
+    } catch (e) {
+      print('Error adding favorite psychiatrist: $e');
+    }
+  }
+
+  Future<void> removeFavoritePsychiatrist(String userId, String psychiatristId) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'favoritePsychiatrists': FieldValue.arrayRemove([psychiatristId])
+      });
+    } catch (e) {
+      print('Error removing favorite psychiatrist: $e');
+    }
+  }
+
+  Future<List<String>> getFavoritePsychiatrists(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+      if (userDoc.exists && userDoc.data() != null) {
+        Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+        return List<String>.from(data['favoritePsychiatrists'] ?? []);
+      }
+    } catch (e) {
+      print('Error fetching favorite psychiatrists: $e');
+    }
+    return [];
   }
 }

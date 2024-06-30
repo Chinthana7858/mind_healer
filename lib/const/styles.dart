@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newproject/const/colors.dart';
 
 class ScreenSize {
   double width(BuildContext context) {
@@ -10,10 +11,6 @@ class ScreenSize {
   }
 }
 
-
-
-
-
 // Define a reusable custom text field widget
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -23,13 +20,14 @@ class CustomTextField extends StatelessWidget {
   final TextInputType keyboardType;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.labelText,
     required this.icon,
     this.obscureText = false, // Default value is false
-    this.keyboardType = TextInputType.text, // Default value is TextInputType.text
-  }) : super(key: key);
+    this.keyboardType =
+        TextInputType.text, // Default value is TextInputType.text
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -59,16 +57,69 @@ class CustomTextField extends StatelessWidget {
   }
 }
 
+class SearchTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelText;
+  final VoidCallback onPressed;
+
+  const SearchTextField({
+    Key? key,
+    required this.controller,
+    required this.labelText,
+    required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: const TextStyle(
+          color: primegreen,
+          fontWeight: FontWeight.w500,
+        ),
+        suffixIcon: IconButton(
+          icon: const Icon(
+            Icons.search,
+            color: primegreen,
+          ),
+          onPressed: onPressed,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: const BorderSide(
+            color: primegreen,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: const BorderSide(color: primegreen),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 15.0,
+          horizontal: 20.0,
+        ),
+        filled: true,
+        fillColor: Colors.grey[100],
+      ),
+      style: const TextStyle(
+        fontSize: 16.0,
+        color: Colors.black,
+      ),
+    );
+  }
+}
 
 class DateOfBirthPicker extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onTap;
 
   const DateOfBirthPicker({
-    Key? key,
+    super.key,
     required this.controller,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +128,7 @@ class DateOfBirthPicker extends StatelessWidget {
       child: AbsorbPointer(
         child: TextField(
           controller: controller,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Date of Birth',
             labelStyle: TextStyle(
               color: Colors.teal,
@@ -97,6 +148,30 @@ class DateOfBirthPicker extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class GradientText extends StatelessWidget {
+  const GradientText(
+    this.text, {
+    super.key,
+    required this.gradient,
+    this.style,
+  });
+
+  final String text;
+  final TextStyle? style;
+  final Gradient gradient;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      blendMode: BlendMode.srcIn,
+      shaderCallback: (bounds) => gradient.createShader(
+        Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+      ),
+      child: Text(text, style: style),
     );
   }
 }

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:newproject/authwrapper.dart';
+import 'package:newproject/auth/authwrapper.dart';
 import 'package:newproject/const/colors.dart';
 
 class SplashScreen extends StatefulWidget {

@@ -1,9 +1,12 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:newproject/const/colors.dart';
-import 'package:newproject/pages/make_appointment.dart';
 import 'package:newproject/service/FirestoreService.dart';
+import 'package:newproject/pages/video_call/videocall.dart';
 
 class PsychiatristHomePage extends StatefulWidget {
   const PsychiatristHomePage({super.key});
@@ -13,27 +16,46 @@ class PsychiatristHomePage extends StatefulWidget {
 }
 
 class _PsychiatristHomePageState extends State<PsychiatristHomePage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirestoreService _firestoreService = FirestoreService();
-  final TextEditingController _searchController = TextEditingController();
-  List<QueryDocumentSnapshot> _searchResults = [];
+  late Stream<QuerySnapshot> _appointmentsStream;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _signout(BuildContext context) async {
     await _auth.signOut();
     Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
   }
 
-  void _search() async {
-    final query = _searchController.text.trim();
-    if (query.isNotEmpty) {
-      final results = await _firestoreService.searchPsychiatrists(query);
-      setState(() {
-        _searchResults = results;
-      });
+  @override
+  void initState() {
+    super.initState();
+    final user = _auth.currentUser;
+    if (user != null) {
+      String userId = user.uid;
+      _appointmentsStream = FirebaseFirestore.instance
+          .collection('appointments')
+          .where('PsychiatristId', isEqualTo: userId)
+          .snapshots();
     } else {
-      setState(() {
-        _searchResults = [];
-      });
+      // Handle the case where the user is not logged in
+      _appointmentsStream = const Stream.empty();
+    }
+  }
+
+  Future<void> _updateAppointmentStatus(
+      String appointmentId, bool isApproved) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('appointments')
+          .doc(appointmentId)
+          .update({'isApproved': isApproved});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Appointment status updated successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update appointment status.')),
+      );
     }
   }
 
@@ -67,11 +89,26 @@ class _PsychiatristHomePageState extends State<PsychiatristHomePage> {
 
                     final userName = userData['name'] as String;
 
-                    return Text('Hi, $userName',
-                        style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: primegreen));
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Hi, Dr. $userName',
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                    color: primegreen)),
+                            const Text('Your appointments',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                    color: primegreen)),
+                          ],
+                        ),
+                      ],
+                    );
                   },
                 )
               : const Text('No user is currently signed in',
@@ -84,148 +121,172 @@ class _PsychiatristHomePageState extends State<PsychiatristHomePage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  labelText: 'Search Psychiatrists',
-                  labelStyle: const TextStyle(
-                    color: primegreen,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(
-                      Icons.search,
-                      color: primegreen,
-                    ),
-                    onPressed: _search,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: const BorderSide(
-                      color: primegreen,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: const BorderSide(
-                      color: Colors.green,
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 15.0,
-                    horizontal: 20.0,
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_searchResults.isEmpty)
-                StreamBuilder<QuerySnapshot>(
-                  stream: _firestoreService.getPsychiatrists(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    final users = snapshot.data!.docs;
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: users.length,
-                      itemBuilder: (context, index) {
-                        final userData =
-                            users[index].data() as Map<String, dynamic>;
-                        return Container(
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 0),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 8.0, horizontal: 16.0),
-                              tileColor: Colors
-                                  .grey[200], // Background color for the tile
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Image.network(
-                                    userData['profilePicture'] ??
-                                        'https://via.placeholder.com/150',
-                                    width: screenWidth,
-                                    height: screenWidth,
-                                    fit: BoxFit.cover,
-                                  ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _appointmentsStream,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return const Center(child: Text('Something went wrong'));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No appointments found'));
+          }
+
+          final appointments = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: appointments.length,
+            itemBuilder: (context, index) {
+              final appointment = appointments[index];
+              final data = appointment.data() as Map<String, dynamic>;
+              final appointmentId = data['AppointmentId'];
+
+              Timestamp? startingTimestamp = data['StartingDateTime'];
+              Timestamp? endingTimestamp = data['endingDateTime'];
+
+              // Convert Timestamp to DateTime if available
+              DateTime? startingDateTime =
+                  startingTimestamp?.toDate();
+
+              DateTime? endingDateTime =
+                  endingTimestamp?.toDate();
+
+              return FutureBuilder<Map<String, dynamic>?>(
+                future: _firestoreService.getUserData(data['UserId']),
+                builder:
+                    (context, AsyncSnapshot<Map<String, dynamic>?> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasError || !snapshot.hasData) {
+                    return ListTile(
+                      title: const Text('Error fetching user data'),
+                      subtitle: Text(
+                        'Date: ${startingDateTime != null ? DateFormat('MMMM d, y').format(startingDateTime) : 'N/A'}\n'
+                        'Starting Time: ${startingDateTime != null ? DateFormat('h:mm a').format(startingDateTime) : 'N/A'}\n'
+                        'Ending Time: ${data['EndingTime'] ?? 'N/A'}\n'
+                        'User ID: ${data['UserId'] ?? 'N/A'}\n'
+                        'Approved: ${(data['isApproved'] ?? false) ? 'Yes' : 'No'}',
+                      ),
+                    );
+                  }
+
+                  final userData = snapshot.data;
+                  final userName = userData!['name'] as String;
+                  final userProfile = userData['profilePicture'];
+                 // final userId = userData['userId'];
+                  return Card(
+                    margin: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: userProfile != null
+                            ? AspectRatio(
+                                aspectRatio: 1,
+                                child: Image.network(
+                                  userProfile,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : AspectRatio(
+                                aspectRatio: 1,
+                                child: Image.asset(
+                                  'assets/images/default_profile.png',
+                                  width: screenWidth * 0.5,
+                                  height: screenWidth * 0.5,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                              title: Text(
-                                userData['name'] != null
-                                    ? 'DR. ${userData['name']}'
-                                    : 'Name not available',
-                              ),
-                              subtitle: Text(userData['qualification'] ?? ''),
-                              trailing: ElevatedButton(
+                      ),
+                      title: Text(userName),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              'Date: ${startingDateTime != null ? DateFormat('MMMM d, y').format(startingDateTime) : 'N/A'}'),
+                          Text(
+                              'Starting Time: ${startingDateTime != null ? DateFormat('h:mm a').format(startingDateTime) : 'N/A'}'),
+                          Text('Ending Time: ${data['EndingTime'] ?? 'N/A'}'),
+                          Text(
+                              (data['isApproved'] ?? false) ? 'Confirmed' : 'Not confirmed'),
+                          !data['isApproved']
+                              ? TextButton(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Colors.green,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                      vertical: 4.0,
+                                    ),
+                                    textStyle: const TextStyle(fontSize: 12),
+                                  ),
+                                  onPressed: () => _updateAppointmentStatus(
+                                      appointment.id, true),
+                                  child: const Text('Confirm'),
+                                )
+                              : TextButton(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Colors.red,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                      vertical: 4.0,
+                                    ),
+                                    textStyle: const TextStyle(fontSize: 12),
+                                  ),
+                                  onPressed: () => _updateAppointmentStatus(
+                                      appointment.id, false),
+                                  child: const Text('Cancel'),
+                                ),
+                        ],
+                      ),
+                      trailing: (data['isApproved'] ?? false)
+                          ? (startingDateTime != null &&
+                                  endingDateTime != null &&
+                                  startingDateTime.isBefore(DateTime.now()) &&
+                                  endingDateTime.isAfter(DateTime.now()))
+                              ? IconButton(
+                                  icon: const Icon(
+                                    Icons.videocam,
+                                    color: Colors.teal,
+                                    size: 40,
+                                  ),
                                   onPressed: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => MakeAppointment(
-                                              psychiatristId: userData['userId']
-                                                  .toString())),
+                                          builder: (context) => VideoCall(
+                                              channelName: appointmentId)),
                                     );
                                   },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: primegreen,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  child: const Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.double_arrow,
-                                        size: 20,
-                                        color: Colors.white,
-                                      ),
-                                    ],
-                                  )),
-                            ));
-                      },
-                    );
-                  },
-                )
-              else
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: _searchResults.length,
-                  itemBuilder: (context, index) {
-                    final userData =
-                        _searchResults[index].data() as Map<String, dynamic>;
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                            userData['profilePicture'] ??
-                                'https://via.placeholder.com/150'),
-                      ),
-                      title: Text(userData['name'] ?? 'Name not available'),
-                      subtitle:
-                          Text(userData['email'] ?? 'Email not available'),
-                    );
-                  },
-                ),
-            ],
-          ),
-        ),
+                                )
+                              : Icon(
+                                  Icons.videocam_off,
+                                  color: Colors.teal.shade200,
+                                  size: 40,
+                                )
+                          : TextButton(
+                              onPressed: null,
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.teal.shade100,
+                              ),
+                              child: const Text(
+                                'Pending',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
       ),
     );
   }

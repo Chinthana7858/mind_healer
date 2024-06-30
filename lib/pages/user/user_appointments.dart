@@ -3,10 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:newproject/const/colors.dart';
-import 'package:newproject/service/FirestoreService.dart'; // Assuming this is the correct path for your FirestoreService
+import 'package:newproject/service/FirestoreService.dart';
+import 'package:newproject/pages/video_call/videocall.dart';
 
 class UserAppointments extends StatefulWidget {
-  const UserAppointments({Key? key}) : super(key: key);
+  const UserAppointments({super.key});
 
   @override
   State<UserAppointments> createState() => _UserAppointmentsState();
@@ -30,7 +31,7 @@ class _UserAppointmentsState extends State<UserAppointments> {
           .snapshots();
     } else {
       // Handle the case where the user is not logged in
-      _appointmentsStream = Stream.empty();
+      _appointmentsStream = const Stream.empty();
     }
   }
 
@@ -71,14 +72,14 @@ class _UserAppointmentsState extends State<UserAppointments> {
             itemBuilder: (context, index) {
               final appointment = appointments[index];
               final data = appointment.data() as Map<String, dynamic>;
-
+              final appointmentId = data['AppointmentId'];
               // Fetch psychiatrist details using FirestoreService
               return FutureBuilder<Map<String, dynamic>?>(
                 future: _firestoreService
                     .getPsychiatristData(data['PsychiatristId']),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return ListTile(
+                    return const ListTile(
                       title: Text('Loading...'),
                     );
                   }
@@ -86,7 +87,7 @@ class _UserAppointmentsState extends State<UserAppointments> {
                   if (snapshot.hasError ||
                       !snapshot.hasData ||
                       snapshot.data == null) {
-                    return ListTile(
+                    return const ListTile(
                       title: Text('Psychiatrist Not Found'),
                     );
                   }
@@ -96,13 +97,13 @@ class _UserAppointmentsState extends State<UserAppointments> {
                   final psychiatristPicture =
                       psychiatristData['profilePicture'];
 
-                  Timestamp? startingTimestamp =
-                      data['StartingDateTime']; // Retrieve Timestamp
+                  Timestamp? startingTimestamp = data['StartingDateTime'];
+                  Timestamp? endingTimestamp = data['endingDateTime'];
 
                   // Convert Timestamp to DateTime if available
-                  DateTime? startingDateTime = startingTimestamp != null
-                      ? startingTimestamp.toDate()
-                      : null;
+                  DateTime? startingDateTime = startingTimestamp?.toDate();
+
+                  DateTime? endingDateTime = endingTimestamp?.toDate();
 
                   return Card(
                     margin: const EdgeInsets.all(8.0),
@@ -127,21 +128,34 @@ class _UserAppointmentsState extends State<UserAppointments> {
                           Text(
                               'Starting Time: ${startingDateTime != null ? DateFormat(' h:mm a').format(startingDateTime) : 'N/A'}'),
                           Text('Ending Time: ${data['EndingTime'] ?? 'N/A'}'),
-                          Text(
-                              '${(data['isApproved'] ?? false) ? 'Confirmed' : 'Pending'}'),
+                          Text((data['isApproved'] ?? false)
+                              ? 'Confirmed'
+                              : 'Pending'),
                         ],
                       ),
                       trailing: (data['isApproved'] ?? false)
                           ? (startingDateTime != null &&
-                                  startingDateTime.isAfter(DateTime.now()))
-                              ? Icon(
-                                  Icons.videocam_off,
-                                  color: Colors.teal.shade200,
-                                  size: 40,
+                                  endingDateTime != null &&
+                                  startingDateTime.isBefore(DateTime.now()) &&
+                                  endingDateTime.isAfter(DateTime.now()))
+                              ? IconButton(
+                                  icon: const Icon(
+                                    Icons.videocam,
+                                    color: Colors.teal,
+                                    size: 40,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => VideoCall(
+                                              channelName: appointmentId)),
+                                    );
+                                  },
                                 )
                               : Icon(
-                                  Icons.videocam,
-                                  color: primegreen,
+                                  Icons.videocam_off,
+                                  color: Colors.teal.shade200,
                                   size: 40,
                                 )
                           : TextButton(
@@ -149,7 +163,7 @@ class _UserAppointmentsState extends State<UserAppointments> {
                               style: TextButton.styleFrom(
                                 backgroundColor: Colors.teal.shade100,
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Pending',
                                 style: TextStyle(color: Colors.white),
                               ),

@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:newproject/psychiatrist_bottom_nav_bar.dart';
-import 'package:newproject/pages/first_screen.dart';
-import 'package:newproject/user_bottom_nav_bar.dart';
+import 'package:newproject/pages/psychiatrist/psychiatrist_bottom_nav_bar.dart';
+import 'package:newproject/pages/other/first_screen.dart';
+import 'package:newproject/pages/user/user_bottom_nav_bar.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
