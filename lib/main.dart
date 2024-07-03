@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:newproject/pages/user/user_home_page.dart';
-import 'package:newproject/pages/other/signin_page.dart';
-import 'package:newproject/pages/other/signup_page.dart';
-import 'package:newproject/pages/other/splash_screen.dart';
+import 'package:mind_healer/auth/authwrapper.dart';
+import 'package:mind_healer/pages/user/user_home_page.dart';
+import 'package:mind_healer/pages/other/signin_page.dart';
+import 'package:mind_healer/pages/other/signup_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const SplashScreen(),
+        '/': (context) => const AuthWrapper(),
         '/signin': (context) => const SigninPage(),
         '/userhomepage': (context) => const UserHomePage(),
         '/signuppage': (context) => const SignupPage(),

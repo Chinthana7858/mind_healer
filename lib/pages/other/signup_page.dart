@@ -5,10 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:newproject/pages/psychiatrist/psychiatrist_bottom_nav_bar.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/const/styles.dart';
-import 'package:newproject/pages/user/user_bottom_nav_bar.dart';
+import 'package:mind_healer/pages/psychiatrist/psychiatrist_bottom_nav_bar.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/const/styles.dart';
+import 'package:mind_healer/pages/user/user_bottom_nav_bar.dart';
 import 'package:image/image.dart' as img;
 
 class SignupPage extends StatefulWidget {

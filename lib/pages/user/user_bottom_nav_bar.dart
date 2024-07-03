@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/pages/user/favourite_doctors.dart';
-import 'package:newproject/pages/user/user_home_page.dart';
-import 'package:newproject/pages/user/user_appointments.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/pages/user/favourite_doctors.dart';
+import 'package:mind_healer/pages/user/user_home_page.dart';
+import 'package:mind_healer/pages/user/user_appointments.dart';
 
 class UserBottomBar extends StatefulWidget {
   const UserBottomBar({super.key, required this.selectedIndex});

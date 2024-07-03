@@ -3,12 +3,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/const/styles.dart';
-import 'package:newproject/pages/chatbot/chat.dart';
-import 'package:newproject/pages/user/make_appointment.dart';
-import 'package:newproject/pages/user/psychiatrist_profile.dart';
-import 'package:newproject/service/FirestoreService.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/const/styles.dart';
+import 'package:mind_healer/pages/chatbot/chat.dart';
+import 'package:mind_healer/pages/user/psychiatrist_profile.dart';
+import 'package:mind_healer/service/FirestoreService.dart';
 
 class UserHomePage extends StatefulWidget {
   const UserHomePage({super.key});
@@ -142,9 +141,9 @@ class _UserHomePageState extends State<UserHomePage> {
                               );
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
+                              backgroundColor: WidgetStateProperty.all<Color>(
                                   Colors.white),
-                              foregroundColor: MaterialStateProperty.all<Color>(
+                              foregroundColor: WidgetStateProperty.all<Color>(
                                   Colors.black),
                             ),
                             child: const Padding(

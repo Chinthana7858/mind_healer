@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/service/FirestoreService.dart';
-import 'package:newproject/pages/video_call/videocall.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/service/FirestoreService.dart';
+import 'package:mind_healer/pages/video_call/videocall.dart';
 
 class PsychiatristHomePage extends StatefulWidget {
   const PsychiatristHomePage({super.key});
@@ -62,7 +62,7 @@ class _PsychiatristHomePageState extends State<PsychiatristHomePage> {
   @override
   Widget build(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
-    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -100,11 +100,6 @@ class _PsychiatristHomePageState extends State<PsychiatristHomePage> {
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
                                     color: primegreen)),
-                            const Text('Your appointments',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                    color: primegreen)),
                           ],
                         ),
                       ],
@@ -138,156 +133,209 @@ class _PsychiatristHomePageState extends State<PsychiatristHomePage> {
 
           final appointments = snapshot.data!.docs;
 
-          return ListView.builder(
-            itemCount: appointments.length,
-            itemBuilder: (context, index) {
-              final appointment = appointments[index];
-              final data = appointment.data() as Map<String, dynamic>;
-              final appointmentId = data['AppointmentId'];
+          // Filter appointments into upcoming and expired lists
+          final now = DateTime.now();
+          final upcomingAppointments = <QueryDocumentSnapshot>[];
+          final expiredAppointments = <QueryDocumentSnapshot>[];
 
-              Timestamp? startingTimestamp = data['StartingDateTime'];
-              Timestamp? endingTimestamp = data['endingDateTime'];
+          appointments.forEach((appointment) {
+            final data = appointment.data() as Map<String, dynamic>;
+            final startingTimestamp = data['StartingDateTime'] as Timestamp?;
+            final endingTimestamp = data['endingDateTime'] as Timestamp?;
 
-              // Convert Timestamp to DateTime if available
-              DateTime? startingDateTime =
-                  startingTimestamp?.toDate();
+            if (startingTimestamp != null && endingTimestamp != null) {
+          //    final startingDateTime = startingTimestamp.toDate();
+              final endingDateTime = endingTimestamp.toDate();
 
-              DateTime? endingDateTime =
-                  endingTimestamp?.toDate();
+              if (endingDateTime.isBefore(now)) {
+                expiredAppointments.add(appointment);
+              } else {
+                upcomingAppointments.add(appointment);
+              }
+            }
+          });
 
-              return FutureBuilder<Map<String, dynamic>?>(
-                future: _firestoreService.getUserData(data['UserId']),
-                builder:
-                    (context, AsyncSnapshot<Map<String, dynamic>?> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError || !snapshot.hasData) {
-                    return ListTile(
-                      title: const Text('Error fetching user data'),
-                      subtitle: Text(
-                        'Date: ${startingDateTime != null ? DateFormat('MMMM d, y').format(startingDateTime) : 'N/A'}\n'
-                        'Starting Time: ${startingDateTime != null ? DateFormat('h:mm a').format(startingDateTime) : 'N/A'}\n'
-                        'Ending Time: ${data['EndingTime'] ?? 'N/A'}\n'
-                        'User ID: ${data['UserId'] ?? 'N/A'}\n'
-                        'Approved: ${(data['isApproved'] ?? false) ? 'Yes' : 'No'}',
-                      ),
-                    );
-                  }
-
-                  final userData = snapshot.data;
-                  final userName = userData!['name'] as String;
-                  final userProfile = userData['profilePicture'];
-                 // final userId = userData['userId'];
-                  return Card(
-                    margin: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: userProfile != null
-                            ? AspectRatio(
-                                aspectRatio: 1,
-                                child: Image.network(
-                                  userProfile,
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            : AspectRatio(
-                                aspectRatio: 1,
-                                child: Image.asset(
-                                  'assets/images/default_profile.png',
-                                  width: screenWidth * 0.5,
-                                  height: screenWidth * 0.5,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                      ),
-                      title: Text(userName),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              'Date: ${startingDateTime != null ? DateFormat('MMMM d, y').format(startingDateTime) : 'N/A'}'),
-                          Text(
-                              'Starting Time: ${startingDateTime != null ? DateFormat('h:mm a').format(startingDateTime) : 'N/A'}'),
-                          Text('Ending Time: ${data['EndingTime'] ?? 'N/A'}'),
-                          Text(
-                              (data['isApproved'] ?? false) ? 'Confirmed' : 'Not confirmed'),
-                          !data['isApproved']
-                              ? TextButton(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.green,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0,
-                                      vertical: 4.0,
-                                    ),
-                                    textStyle: const TextStyle(fontSize: 12),
-                                  ),
-                                  onPressed: () => _updateAppointmentStatus(
-                                      appointment.id, true),
-                                  child: const Text('Confirm'),
-                                )
-                              : TextButton(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.red,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0,
-                                      vertical: 4.0,
-                                    ),
-                                    textStyle: const TextStyle(fontSize: 12),
-                                  ),
-                                  onPressed: () => _updateAppointmentStatus(
-                                      appointment.id, false),
-                                  child: const Text('Cancel'),
-                                ),
-                        ],
-                      ),
-                      trailing: (data['isApproved'] ?? false)
-                          ? (startingDateTime != null &&
-                                  endingDateTime != null &&
-                                  startingDateTime.isBefore(DateTime.now()) &&
-                                  endingDateTime.isAfter(DateTime.now()))
-                              ? IconButton(
-                                  icon: const Icon(
-                                    Icons.videocam,
-                                    color: Colors.teal,
-                                    size: 40,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => VideoCall(
-                                              channelName: appointmentId)),
-                                    );
-                                  },
-                                )
-                              : Icon(
-                                  Icons.videocam_off,
-                                  color: Colors.teal.shade200,
-                                  size: 40,
-                                )
-                          : TextButton(
-                              onPressed: null,
-                              style: TextButton.styleFrom(
-                                backgroundColor: Colors.teal.shade100,
-                              ),
-                              child: const Text(
-                                'Pending',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
+          return ListView(
+            children: [
+              if (upcomingAppointments.isNotEmpty) ...[
+                const Padding(
+                  padding: EdgeInsets.only(left: 18),
+                  child: Text(
+                    'Upcoming Appointments',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: primegreen,
                     ),
-                  );
-                },
-              );
-            },
+                  ),
+                ),
+                ...upcomingAppointments
+                    .map((appointment) => _buildAppointmentCard(appointment))
+                    .toList(),
+              ],
+              if (expiredAppointments.isNotEmpty) ...[
+                const Padding(
+                  padding: EdgeInsets.only(left: 18),
+                  child: Text(
+                    'Expired Appointments',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: primegreen,
+                    ),
+                  ),
+                ),
+                ...expiredAppointments
+                    .map((appointment) => _buildAppointmentCard(appointment))
+                    .toList(),
+              ],
+            ],
           );
         },
       ),
+    );
+  }
+
+  Widget _buildAppointmentCard(QueryDocumentSnapshot appointment) {
+    final data = appointment.data() as Map<String, dynamic>;
+    final appointmentId = data['AppointmentId'];
+    double screenWidth = MediaQuery.of(context).size.width;
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: _firestoreService.getUserData(data['UserId']),
+      builder: (context, AsyncSnapshot<Map<String, dynamic>?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError || !snapshot.hasData) {
+          return ListTile(
+            title: const Text('Error fetching user data'),
+            subtitle: Text(
+              'Date: ${data['StartingDateTime'] != null ? DateFormat('MMMM d, y').format(data['StartingDateTime'].toDate()) : 'N/A'}\n'
+              'Starting Time: ${data['StartingDateTime'] != null ? DateFormat('h:mm a').format(data['StartingDateTime'].toDate()) : 'N/A'}\n'
+              'Ending Time: ${data['EndingTime'] ?? 'N/A'}\n'
+              'User ID: ${data['UserId'] ?? 'N/A'}\n'
+              'Approved: ${(data['isApproved'] ?? false) ? 'Yes' : 'No'}',
+            ),
+          );
+        }
+
+        final userData = snapshot.data;
+        final userName = userData!['name'] as String;
+        final userProfile = userData['profilePicture'];
+
+        Timestamp? startingTimestamp = data['StartingDateTime'];
+        Timestamp? endingTimestamp = data['endingDateTime'];
+
+        // Convert Timestamp to DateTime if available
+        DateTime? startingDateTime = startingTimestamp?.toDate();
+        DateTime? endingDateTime = endingTimestamp?.toDate();
+
+        return Card(
+          margin: const EdgeInsets.all(8.0),
+          child: ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: userProfile != null
+                  ? AspectRatio(
+                      aspectRatio: 1,
+                      child: Image.network(
+                        userProfile,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : AspectRatio(
+                      aspectRatio: 1,
+                      child: Image.asset(
+                        'assets/images/default_profile.png',
+                        width: screenWidth * 0.5,
+                        height: screenWidth * 0.5,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+            ),
+            title: Text(userName),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    'Date: ${startingDateTime != null ? DateFormat('MMMM d, y').format(startingDateTime) : 'N/A'}'),
+                Text(
+                    'Starting Time: ${startingDateTime != null ? DateFormat('h:mm a').format(startingDateTime) : 'N/A'}'),
+                Text('Ending Time: ${data['EndingTime'] ?? 'N/A'}'),
+                Text((data['isApproved'] ?? false)
+                    ? 'Confirmed'
+                    : 'Not confirmed'),
+                !data['isApproved']
+                    ? TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 4.0,
+                          ),
+                          textStyle: const TextStyle(fontSize: 12),
+                        ),
+                        onPressed: () =>
+                            _updateAppointmentStatus(appointment.id, true),
+                        child: const Text('Confirm'),
+                      )
+                    : TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.red,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 4.0,
+                          ),
+                          textStyle: const TextStyle(fontSize: 12),
+                        ),
+                        onPressed: () =>
+                            _updateAppointmentStatus(appointment.id, false),
+                        child: const Text('Cancel'),
+                      ),
+              ],
+            ),
+            trailing: (data['isApproved'] ?? false)
+                ? (startingDateTime != null &&
+                        endingDateTime != null &&
+                        startingDateTime.isBefore(DateTime.now()) &&
+                        endingDateTime.isAfter(DateTime.now()))
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.videocam,
+                          color: Colors.teal,
+                          size: 40,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => VideoCall(
+                                      channelName: appointmentId,
+                                    )),
+                          );
+                        },
+                      )
+                    : Icon(
+                        Icons.videocam_off,
+                        color: Colors.teal.shade200,
+                        size: 40,
+                      )
+                : TextButton(
+                    onPressed: null,
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.teal.shade100,
+                    ),
+                    child: const Text(
+                      'Pending',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+          ),
+        );
+      },
     );
   }
 }

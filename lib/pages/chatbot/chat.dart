@@ -1,10 +1,10 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/const/keys.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/const/keys.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart' as path_helper;
 
 class ChatPage extends StatefulWidget {
   static const routeName = '/chat';
@@ -21,58 +21,153 @@ class _ChatPageState extends State<ChatPage> {
 
   late final GenerativeModel _model;
   late final ChatSession _chat;
+  late Database _database;
+  bool _initialMessageProcessed = false;
 
   @override
   void initState() {
     super.initState();
     _model = GenerativeModel(model: 'gemini-pro', apiKey: api_key);
 
+    _initializeChat();
+  }
+
+  Future<void> _initializeChat() async {
+    // Get the path to the database
+    var databasesPath = await getDatabasesPath();
+    String dbPath = path_helper.join(databasesPath, 'messages.db');
+
+    // Open the database
+    _database = await openDatabase(dbPath, version: 1,
+        onCreate: (Database db, int version) async {
+      // When creating the db, create the table
+      await db.execute(
+          'CREATE TABLE messages (id INTEGER PRIMARY KEY AUTOINCREMENT, message TEXT, isSender INTEGER)');
+    });
+
+    List<Map> list =
+        await _database.rawQuery('SELECT * FROM messages ORDER BY id DESC');
+    setState(() {
+      _chatHistory.addAll(list.map((item) => {
+            "message": item['message'],
+            "isSender": item['isSender'] == 1,
+            "isImage": false,
+          }));
+    });
+
+    // Initialize chat
     _chat = _model.startChat();
+
+    // Send an initial message to set the context or instructions for the chat model
+    String initialCommand =
+        "You are a helpful assistant who diagnoses mental health issues by chatting with users. Always assist as a supportive adviser.";
+    try {
+      final response = await _chat.sendMessage(Content.text(initialCommand));
+      // Print the response to console
+      print(response.text);
+      setState(() {
+        _initialMessageProcessed = true;
+      });
+    } catch (e) {
+      print('Error initializing chat: $e');
+    }
   }
 
   Future<void> getAnswer(String text) async {
-    try {
-      late final dynamic response;
-
-      response = await _chat.sendMessage(Content.text(text));
-
-      setState(() {
-        _chatHistory.add({
-          "time": DateTime.now(),
+    if (_initialMessageProcessed) {
+      try {
+        late final dynamic response;
+        response = await _chat.sendMessage(Content.text(text));
+        // Print the response to console
+        print(response.text);
+        final messageData = {
+          "time": DateTime.now().toIso8601String(),
           "message": response.text,
           "isSender": false,
-          "isImage": false
-        });
-      });
+          "isImage": false,
+        };
 
-      _scrollController.jumpTo(
-        _scrollController.position.maxScrollExtent,
-      );
-    } catch (e) {
-      print('Error: $e');
-    } finally {}
+        // Save the received message to the database
+        await _database.insert('messages', {
+          "message": response.text,
+          "isSender": 0,
+        });
+
+        setState(() {
+          _chatHistory.insert(0, messageData);
+        });
+
+        _scrollController.jumpTo(
+          0.0,
+        );
+      } catch (e) {
+        print('Error: $e');
+      } finally {}
+    }
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     if (_chatController.text.isNotEmpty) {
+      final messageData = {
+        "time": DateTime.now().toIso8601String(),
+        "message": _chatController.text,
+        "isSender": true,
+        "isImage": false,
+      };
+      // Save the sent message to the database
+      await _database.insert('messages', {
+        "message": _chatController.text,
+        "isSender": 1,
+      });
+
       setState(() {
-        if (_chatController.text.isNotEmpty) {
-          _chatHistory.add({
-            "time": DateTime.now(),
-            "message": _chatController.text,
-            "isSender": true,
-            "isImage": false
-          });
-        }
+        _chatHistory.insert(0, messageData);
       });
 
       getAnswer(_chatController.text);
       _chatController.clear();
 
       _scrollController.jumpTo(
-        _scrollController.position.maxScrollExtent,
+        0.0,
       );
     }
+  }
+
+  void _deleteAllMessages() async {
+    // Delete all messages from the database
+    await _database.delete('messages');
+
+    // Clear the chat history in the UI
+    setState(() {
+      _chatHistory.clear();
+    });
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text("Delete All Messages"),
+          content: const Text("Are you sure you want to delete all messages?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteAllMessages();
+                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -80,15 +175,25 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Chat",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          "Ai assistant",
+          style: TextStyle(fontWeight: FontWeight.w400, color: primegreen),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.delete_outline_rounded,
+              color: Colors.red,
+            ),
+            onPressed: () => _showDeleteConfirmationDialog(context),
+          ),
+        ],
       ),
       body: Stack(
         children: [
           SizedBox(
             height: MediaQuery.of(context).size.height - 160,
             child: ListView.builder(
+              reverse: true,
               itemCount: _chatHistory.length,
               shrinkWrap: false,
               controller: _scrollController,

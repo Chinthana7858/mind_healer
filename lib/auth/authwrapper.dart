@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:newproject/pages/psychiatrist/psychiatrist_bottom_nav_bar.dart';
-import 'package:newproject/pages/other/first_screen.dart';
-import 'package:newproject/pages/user/user_bottom_nav_bar.dart';
+import 'package:mind_healer/pages/other/first_screen.dart';
+import 'package:mind_healer/pages/other/splash_screen.dart';
+import 'package:mind_healer/pages/psychiatrist/psychiatrist_bottom_nav_bar.dart';
+import 'package:mind_healer/pages/user/user_bottom_nav_bar.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
@@ -32,7 +33,7 @@ class AuthWrapper extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const SplashScreen();
         } else if (snapshot.hasData) {
           String uid = snapshot.data!.uid;
 
@@ -40,7 +41,7 @@ class AuthWrapper extends StatelessWidget {
             future: _getUserType(uid),
             builder: (context, userTypeSnapshot) {
               if (userTypeSnapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return const SplashScreen();
               } else if (userTypeSnapshot.hasData) {
                 if (userTypeSnapshot.data == 'psychiatrist') {
                   return const PsyBottomBar(selectedIndex: 0);

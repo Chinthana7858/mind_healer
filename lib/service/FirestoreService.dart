@@ -99,4 +99,14 @@ class FirestoreService {
     }
     return [];
   }
+  Future<void> updateUserData(String userId, Map<String, dynamic> newData) async {
+    try {
+      await _firestore.collection('users').doc(userId).update(newData);
+      print('User data updated successfully');
+    } catch (e) {
+      print('Error updating user data: $e');
+      throw e; // Rethrow the exception to handle it in the caller function
+    }
+  }
+  
 }

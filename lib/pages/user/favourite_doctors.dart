@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/pages/user/psychiatrist_profile.dart';
-import 'package:newproject/service/FirestoreService.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/pages/user/psychiatrist_profile.dart';
+import 'package:mind_healer/service/FirestoreService.dart';
 
 class FavoriteDoctors extends StatefulWidget {
   const FavoriteDoctors({super.key});
@@ -15,7 +15,6 @@ class FavoriteDoctors extends StatefulWidget {
 class _FavoriteDoctorsState extends State<FavoriteDoctors> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirestoreService _firestoreService = FirestoreService();
-  final TextEditingController _searchController = TextEditingController();
   List<String> _favoritePsychiatrists = [];
 
   @override
@@ -51,7 +50,7 @@ class _FavoriteDoctorsState extends State<FavoriteDoctors> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
+ 
     return Scaffold(
       appBar: AppBar(
         title: const Text(

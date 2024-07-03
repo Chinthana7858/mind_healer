@@ -3,10 +3,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:newproject/pages/psychiatrist/psychiatrist_bottom_nav_bar.dart';
-import 'package:newproject/const/colors.dart'; // Assuming you have defined primegreen color
-import 'package:newproject/const/styles.dart';
-import 'package:newproject/pages/user/user_bottom_nav_bar.dart'; // Assuming you have ScreenSize class defined
+import 'package:mind_healer/pages/psychiatrist/psychiatrist_bottom_nav_bar.dart';
+import 'package:mind_healer/const/colors.dart'; // Assuming you have defined primegreen color
+import 'package:mind_healer/const/styles.dart';
+import 'package:mind_healer/pages/user/user_bottom_nav_bar.dart'; // Assuming you have ScreenSize class defined
 
 class SigninPage extends StatefulWidget {
   const SigninPage({super.key});
@@ -33,20 +33,21 @@ class _SigninPageState extends State<SigninPage> {
       );
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Signin successful!')));
-          final userType = await _getUserType(userCredential.user!.uid);
+      final userType = await _getUserType(userCredential.user!.uid);
 
       if (userType == 'psychiatrist') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const PsyBottomBar(selectedIndex: 0)),
+          MaterialPageRoute(
+              builder: (context) => const PsyBottomBar(selectedIndex: 0)),
         );
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const UserBottomBar(selectedIndex: 0)),
+          MaterialPageRoute(
+              builder: (context) => const UserBottomBar(selectedIndex: 0)),
         );
       }
-      
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.message ?? 'Signin failed')));
@@ -59,13 +60,18 @@ class _SigninPageState extends State<SigninPage> {
       });
     }
   }
- Future<String?> _getUserType(String uid) async {
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+  Future<String?> _getUserType(String uid) async {
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
     if (userDoc.exists) {
       return userDoc['userType'];
     }
 
-    final psychiatristDoc = await FirebaseFirestore.instance.collection('psychiatrists').doc(uid).get();
+    final psychiatristDoc = await FirebaseFirestore.instance
+        .collection('psychiatrists')
+        .doc(uid)
+        .get();
     if (psychiatristDoc.exists) {
       return psychiatristDoc['userType'];
     }

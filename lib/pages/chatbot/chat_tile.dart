@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:mind_healer/const/colors.dart';
 
 class ChatTile extends StatelessWidget {
-  final List<Color> gradientColors;
-  final BorderRadiusGeometry borderRadius;
   final Widget child;
 
   const ChatTile({
     Key? key,
-    required this.gradientColors,
-    this.borderRadius = const BorderRadius.all(Radius.circular(10.0)),
+    
     required this.child,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: gradientColors,
+          colors: [
+                                  Colors.teal,
+                                  primegreen,
+                                ]
         ),
-        borderRadius: borderRadius,
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       child: child,
     );
