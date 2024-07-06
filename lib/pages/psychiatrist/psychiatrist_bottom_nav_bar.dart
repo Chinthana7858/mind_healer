@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mind_healer/const/colors.dart';
-import 'package:mind_healer/pages/psychiatrist/user_profile.dart';
+import 'package:mind_healer/pages/psychiatrist/psychiatrist_profile.dart';
 import 'package:mind_healer/pages/psychiatrist/psychiatrist_home_page.dart';
 
 class PsyBottomBar extends StatefulWidget {
@@ -14,7 +14,7 @@ class PsyBottomBar extends StatefulWidget {
 }
 
 class _PsyBottomBarState extends State<PsyBottomBar> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+ // final FirebaseAuth _auth = FirebaseAuth.instance;
   late int _selectedIndex;
 
   @override
@@ -79,7 +79,7 @@ class _PsyBottomBarState extends State<PsyBottomBar> {
       case 0:
         return const PsychiatristHomePage();
       case 1:
-        return UserProfileEditPage(userId: user!.uid);
+        return PsychiatristProfileEditPage(userId: user!.uid);
       default:
         return Container();
     }

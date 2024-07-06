@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/pages/user/user_profile.dart';
 import 'package:mind_healer/service/FirestoreService.dart';
 import 'package:mind_healer/pages/video_call/videocall.dart';
 
@@ -144,7 +145,7 @@ class _PsychiatristHomePageState extends State<PsychiatristHomePage> {
             final endingTimestamp = data['endingDateTime'] as Timestamp?;
 
             if (startingTimestamp != null && endingTimestamp != null) {
-          //    final startingDateTime = startingTimestamp.toDate();
+              //    final startingDateTime = startingTimestamp.toDate();
               final endingDateTime = endingTimestamp.toDate();
 
               if (endingDateTime.isBefore(now)) {
@@ -234,25 +235,36 @@ class _PsychiatristHomePageState extends State<PsychiatristHomePage> {
         return Card(
           margin: const EdgeInsets.all(8.0),
           child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: userProfile != null
-                  ? AspectRatio(
-                      aspectRatio: 1,
-                      child: Image.network(
-                        userProfile,
-                        fit: BoxFit.cover,
+            leading: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        UserProfilePage(userId: userData['userId']),
+                  ),
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: userProfile != null
+                    ? AspectRatio(
+                        aspectRatio: 1,
+                        child: Image.network(
+                          userProfile,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : AspectRatio(
+                        aspectRatio: 1,
+                        child: Image.asset(
+                          'assets/images/default_profile.png',
+                          width: screenWidth * 0.5,
+                          height: screenWidth * 0.5,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    )
-                  : AspectRatio(
-                      aspectRatio: 1,
-                      child: Image.asset(
-                        'assets/images/default_profile.png',
-                        width: screenWidth * 0.5,
-                        height: screenWidth * 0.5,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+              ),
             ),
             title: Text(userName),
             subtitle: Column(

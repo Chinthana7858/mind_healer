@@ -33,6 +33,7 @@ class FirestoreService {
     }
   }
 
+
   Stream<QuerySnapshot> getPsychiatrists() {
     return _firestore.collection('psychiatrists').snapshots();
   }
@@ -43,7 +44,8 @@ class FirestoreService {
         .where('specialist', isEqualTo: 'true')
         .snapshots();
   }
-    Stream<QuerySnapshot> getNonSpecialistPsychiatrists() {
+
+  Stream<QuerySnapshot> getNonSpecialistPsychiatrists() {
     return _firestore
         .collection('psychiatrists')
         .where('specialist', isEqualTo: 'false')
@@ -67,7 +69,8 @@ class FirestoreService {
     }
   }
 
-   Future<void> addFavoritePsychiatrist(String userId, String psychiatristId) async {
+  Future<void> addFavoritePsychiatrist(
+      String userId, String psychiatristId) async {
     try {
       await _firestore.collection('users').doc(userId).update({
         'favoritePsychiatrists': FieldValue.arrayUnion([psychiatristId])
@@ -77,7 +80,8 @@ class FirestoreService {
     }
   }
 
-  Future<void> removeFavoritePsychiatrist(String userId, String psychiatristId) async {
+  Future<void> removeFavoritePsychiatrist(
+      String userId, String psychiatristId) async {
     try {
       await _firestore.collection('users').doc(userId).update({
         'favoritePsychiatrists': FieldValue.arrayRemove([psychiatristId])
@@ -89,7 +93,8 @@ class FirestoreService {
 
   Future<List<String>> getFavoritePsychiatrists(String userId) async {
     try {
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(userId).get();
       if (userDoc.exists && userDoc.data() != null) {
         Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
         return List<String>.from(data['favoritePsychiatrists'] ?? []);
@@ -99,7 +104,9 @@ class FirestoreService {
     }
     return [];
   }
-  Future<void> updateUserData(String userId, Map<String, dynamic> newData) async {
+
+  Future<void> updateUserData(
+      String userId, Map<String, dynamic> newData) async {
     try {
       await _firestore.collection('users').doc(userId).update(newData);
       print('User data updated successfully');
@@ -108,5 +115,36 @@ class FirestoreService {
       throw e; // Rethrow the exception to handle it in the caller function
     }
   }
-  
+   Future<void> updatePsychiatristData(
+      String userId, Map<String, dynamic> newData) async {
+    try {
+      await _firestore.collection('psychiatrists').doc(userId).update(newData);
+      print('Psychiatrist data updated successfully');
+    } catch (e) {
+      print('Error updating user data: $e');
+      throw e; // Rethrow the exception to handle it in the caller function
+    }
+  }
+
+  Future<void> createPsychiatristUserData(
+      String userId, Map<String, dynamic> userData) async {
+    try {
+      await _firestore.collection('psychiatrists').doc(userId).set(userData);
+      print('User data created successfully');
+    } catch (e) {
+      print('Error creating user data: $e');
+      throw e; // Rethrow the exception to handle it in the caller function
+    }
+  }
+
+   Future<void> createUserData(
+      String userId, Map<String, dynamic> userData) async {
+    try {
+      await _firestore.collection('users').doc(userId).set(userData);
+      print('User data created successfully');
+    } catch (e) {
+      print('Error creating user data: $e');
+      throw e; // Rethrow the exception to handle it in the caller function
+    }
+  }
 }
