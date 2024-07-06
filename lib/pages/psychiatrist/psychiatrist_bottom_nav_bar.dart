@@ -1,18 +1,20 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/pages/user/user_home_page.dart';
-import 'package:newproject/pages/user/user_appointments.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/pages/psychiatrist/psychiatrist_profile.dart';
+import 'package:mind_healer/pages/psychiatrist/psychiatrist_home_page.dart';
 
-class UserBottomBar extends StatefulWidget {
-  const UserBottomBar({super.key, required this.selectedIndex});
+class PsyBottomBar extends StatefulWidget {
+  const PsyBottomBar({super.key, required this.selectedIndex});
 
   final int selectedIndex;
 
   @override
-  State<UserBottomBar> createState() => _UserBottomBarState();
+  State<PsyBottomBar> createState() => _PsyBottomBarState();
 }
 
-class _UserBottomBarState extends State<UserBottomBar> {
+class _PsyBottomBarState extends State<PsyBottomBar> {
+ // final FirebaseAuth _auth = FirebaseAuth.instance;
   late int _selectedIndex;
 
   @override
@@ -55,7 +57,7 @@ class _UserBottomBarState extends State<UserBottomBar> {
                 IconButton(
                   onPressed: () => _onNavItemPressed(1),
                   icon: const Icon(
-                    Icons.event,
+                    Icons.person,
                     color: Colors.white,
                   ),
                 ),
@@ -72,11 +74,12 @@ class _UserBottomBarState extends State<UserBottomBar> {
   }
 
   Widget _getPage(int index) {
+    final User? user = FirebaseAuth.instance.currentUser;
     switch (index) {
       case 0:
-        return UserHomePage();
+        return const PsychiatristHomePage();
       case 1:
-        return UserAppointments();
+        return PsychiatristProfileEditPage(userId: user!.uid);
       default:
         return Container();
     }

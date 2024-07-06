@@ -1,8 +1,10 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/const/styles.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/const/styles.dart';
 
 class MakeAppointment extends StatefulWidget {
   const MakeAppointment({super.key, required this.psychiatristId});
@@ -14,7 +16,8 @@ class MakeAppointment extends StatefulWidget {
 
 class _MakeAppointmentState extends State<MakeAppointment> {
   final _formKey = GlobalKey<FormState>();
-  DateTime? _startingDateTime; // New variable to store combined date and time
+  DateTime? _startingDateTime;
+  DateTime? _endingDateTime;
   final TextEditingController _endTimeController = TextEditingController();
   final bool _isApproved = false;
 
@@ -68,6 +71,13 @@ class _MakeAppointmentState extends State<MakeAppointment> {
           _startingDateTime?.hour ?? 0,
           _startingDateTime?.minute ?? 0,
         );
+        _endingDateTime = DateTime(
+          picked.year,
+          picked.month,
+          picked.day,
+          _endingDateTime?.hour ?? 0,
+          _endingDateTime?.minute ?? 0,
+        );
       });
     }
   }
@@ -99,6 +109,13 @@ class _MakeAppointmentState extends State<MakeAppointment> {
     if (picked != null) {
       setState(() {
         controller.text = picked.format(context);
+        _endingDateTime = DateTime(
+          _endingDateTime?.year ?? DateTime.now().year,
+          _endingDateTime?.month ?? DateTime.now().month,
+          _endingDateTime?.day ?? DateTime.now().day,
+          picked.hour,
+          picked.minute,
+        );
       });
     }
   }
@@ -110,11 +127,12 @@ class _MakeAppointmentState extends State<MakeAppointment> {
       Map<String, dynamic> appointmentData = {
         'AppointmentId':
             FirebaseFirestore.instance.collection('appointments').doc().id,
-        'StartingDateTime': _startingDateTime, // Store as DateTime
+        'StartingDateTime': _startingDateTime,
         'EndingTime': _endTimeController.text,
         'PsychiatristId': widget.psychiatristId,
         'UserId': userId,
         'isApproved': _isApproved,
+        'endingDateTime': _endingDateTime,
       };
 
       try {
@@ -160,8 +178,7 @@ class _MakeAppointmentState extends State<MakeAppointment> {
                   borderRadius: BorderRadius.circular(8.0),
                   child: AspectRatio(
                     aspectRatio: 1,
-                    child: _psychiatristProfileUrl != null &&
-                            _psychiatristProfileUrl.isNotEmpty
+                    child: _psychiatristProfileUrl.isNotEmpty
                         ? Image.network(
                             _psychiatristProfileUrl,
                             width: screenWidth * 0.5,
@@ -193,14 +210,14 @@ class _MakeAppointmentState extends State<MakeAppointment> {
                         'Dr $_psychiatristName',
                         textAlign:
                             TextAlign.center, // Center align text horizontally
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: primegreen,
                         ),
                       ),
                       Text(
-                        '$_psychiatristQualification',
+                        _psychiatristQualification,
                         textAlign:
                             TextAlign.center, // Center align text horizontally
                         style: TextStyle(
@@ -209,7 +226,7 @@ class _MakeAppointmentState extends State<MakeAppointment> {
                         ),
                       ),
                       Text(
-                        '$_psychiatristEmail',
+                        _psychiatristEmail,
                         textAlign:
                             TextAlign.center, // Center align text horizontally
                         style: TextStyle(
@@ -283,7 +300,7 @@ class _MakeAppointmentState extends State<MakeAppointment> {
                         ),
                       ),
                       onPressed: () {
-                        _submitForm;
+                        _submitForm();
                       },
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
