@@ -3,9 +3,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mind_healer/const/colors.dart';
-import 'package:mind_healer/pages/user/make_appointment.dart';
-import 'package:mind_healer/service/FirestoreService.dart';
+import 'package:newproject/const/colors.dart';
+import 'package:newproject/pages/user/make_appointment.dart';
+import 'package:newproject/service/FirestoreService.dart';
 
 class PsychiatristProfile extends StatefulWidget {
   const PsychiatristProfile({super.key, required this.psychiatristId});

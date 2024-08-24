@@ -4,7 +4,7 @@
 <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
-        android:label="Mind Healer"
+        android:label="newproject"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
