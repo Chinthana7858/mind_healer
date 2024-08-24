@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import 'package:mind_healer/const/colors.dart';
-import 'package:mind_healer/service/FirestoreService.dart';
-import 'package:mind_healer/pages/video_call/videocall.dart';
+import 'package:newproject/const/colors.dart';
+import 'package:newproject/service/FirestoreService.dart';
+import 'package:newproject/pages/video_call/videocall.dart';
 
 class UserAppointments extends StatefulWidget {
   const UserAppointments({super.key});

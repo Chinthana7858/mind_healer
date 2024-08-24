@@ -3,12 +3,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mind_healer/const/colors.dart';
-import 'package:mind_healer/const/styles.dart';
-import 'package:mind_healer/pages/chatbot/chat.dart';
-import 'package:mind_healer/pages/user/psychiatrist_profile.dart';
-import 'package:mind_healer/pages/user/user_profile_edit.dart';
-import 'package:mind_healer/service/FirestoreService.dart';
+import 'package:newproject/const/colors.dart';
+import 'package:newproject/const/styles.dart';
+import 'package:newproject/pages/chatbot/chat.dart';
+import 'package:newproject/pages/user/psychiatrist_profile.dart';
+import 'package:newproject/service/FirestoreService.dart';
 
 class UserHomePage extends StatefulWidget {
   const UserHomePage({super.key});
@@ -82,20 +81,6 @@ class _UserHomePageState extends State<UserHomePage> {
                 style: TextStyle(fontSize: 18)),
         actions: [
           IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        UserProfileEditPage(userId: user!.uid)),
-              );
-            },
-            icon: const Icon(
-              Icons.person,
-              color: primegreen,
-            ),
-          ),
-          IconButton(
             onPressed: () => _signout(context),
             icon: const Icon(Icons.logout),
           ),
@@ -125,73 +110,59 @@ class _UserHomePageState extends State<UserHomePage> {
                 ),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(top: 16.0, left: 16.0),
-                            child: Text("Hi! You Can Ask Me",
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 16.0, left: 16.0),
+                          child: Text("Hi! You Can Ask Me",
+                              style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 16.0),
+                          child: Text("Anything",
+                              style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: 8.0, left: 16.0, bottom: 16.0),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const ChatPage()),
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all<Color>(
+                                  Colors.white),
+                              foregroundColor: WidgetStateProperty.all<Color>(
+                                  Colors.black),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              child: GradientText(
+                                "Ask Now",
                                 style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 16.0),
-                            child: Text("Anything",
-                                style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 8.0, left: 16.0, bottom: 16.0),
-                            child: TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const ChatPage()),
-                                );
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all<Color>(
-                                    Colors.white),
-                                foregroundColor: WidgetStateProperty.all<Color>(
-                                    Colors.black),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                child: GradientText(
-                                  "Ask Now",
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  gradient: LinearGradient(colors: [
-                                    Colors.teal,
-                                    primegreen,
-                                  ]),
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
                                 ),
+                                gradient: LinearGradient(colors: [
+                                  Colors.teal,
+                                  primegreen,
+                                ]),
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: screenWidth * 0.35,
-                      height: screenWidth * 0.35,
-                      margin: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/images/chatbot.png'),
-                          fit: BoxFit.cover,
                         ),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
+                      ],
                     ),
                   ],
                 ),
