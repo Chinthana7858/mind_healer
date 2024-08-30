@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/const/keys.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/const/keys.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path_helper;
 
