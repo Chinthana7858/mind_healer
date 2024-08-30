@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "therapybot-nw9n",
+  "private_key_id": "71c075316d94c919e10283042195162be06768fb",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDYy32JCAjGYp06\nq7y5GxdLprM+OeW2dko8nwMiqjo+3CQmuk3WclWKSE9sgiOBYLazPq8Npx2YB8Tq\nckSZIsL3rvt8SISh5HbXGkJqwlANmntMsj80AZkV0POvRc2oFMQQv5bqtD8j4fvM\nI9/vMeT2Orda754H+H4Y8ZgHtKp4zgp1DC3xqbV+HRWSwSO7Z5KPIF2SWQndtlM7\nwZJLufHIAVGWrgY8Ges7rIv8DSo7g0pCpIsNRIz74OqhoZqskCES0BOJgJC/IfdI\nmXOg+xlbHJBAo2l/JhfiuvHuSJFSrQOwNxaN5yga3wbzcrDUf1eCZtHRjE+zqsEO\nW47+ysW1AgMBAAECggEATyxRlj/G5JyTCyA49ej84vXoM+t1BuPATM9Nl9VPHDHN\nSg9z6cMrliq+RsRoLxGg52kXCQdk+Was9Wnxv3NAfK/8y/C371++PuQqKU75aV5n\ndSULi/ShcaQzumjlqGKdD/jIJsLY5EPdbzoSyAoSshHTcHRd5E9NzdI9UWMbdq4s\nFoXsEZHhS026xZ80mhuCdsAKcTKWBAk12NpiBm+TE6BwHjFs9UqVJFPCn61g42So\n8h7ZLczKmER8ecn4iSDDG+juQ4rrrgSYzg78WHvOGBVEYE+lRSP3zR1Ctj/K7QjG\nwHztdUtoJPh5fNteb0L/2T4jscrE1yErFGFHKzjf6QKBgQD7iO7u+qLL0B3kHSxN\nWEtiCJZ8QLV6UgT9tUObFjdbMkB8HWNvhmiM2NVSkgf7JUTveuoAfK4Y/8nOcKuH\n4FWoy/aZNYJPQ4caPB9nCElciGTu0vGrVUI7yKVYbSI3GnW304xyUBQ6AxUsefXM\nSCBbBIwP022l+HJe/0aLeITT9wKBgQDcpK+KZi5kvHJulWnFy09lcmywQOC6tVn9\nuzMrVT0tBfBeuBqHk+tmp7a9pSXt5Y9SAEU2dxwmXNXgoe2vKafNeXv+A1/2TP0L\ncPq3/wLqJ4BTsaK1Z+SIxJGMNCzoQTQyXtHlkh8HKRaPkP0ag5W9BLtzdneVXfjC\nsTAk06XwswKBgQCVn3bBoUWFh17AeroHqCXvQryBXNyWzoM5h8GXVzfGf7XsHm8v\nv/whDDqYy1UEB79h1POtJn1JUZ5xtoPSZ5eMuQcPS80f6UNMT8c+Oqeo61le1wv6\nptSnS0tPtltL++laV/SLaycc+wh1VHbp9V2JxsKqB1KKD6e46pDEFgStMQKBgB6j\n7BCvIfAxTz7WFus10Z/H5RoQ2GR1PLsEnRV+b9FpyriMnnqHayBFWBY78el4gI+l\no/btUYZuS/E263fws/HP1g0vUMs2Y8mL9fVJP5FezO5Sc8L3W4A2s/OhZz8VlvcL\nveBAi3iGFzD2tH9TGJ84IgPlxrOCakI3MvVaQugLAoGAMS5ZC2ua3nVTsBK+mgOk\nk44rIwYuOhV4ItnNIV+ixO6h5nAoLdbui5FDBkpg8B4Rn6wjnB2vsp0zwSaAe5cK\nSGf7tJFxeKBlikrUUvODmr5M+Bg5/Xg9AqcZfqsLdiMXmzbJ69j2a3eB25+Fpqwx\nKgQOEXdixwezL8qzXinWE0s=\n-----END PRIVATE KEY-----\n",
+  "client_email": "theropybot@therapybot-nw9n.iam.gserviceaccount.com",
+  "client_id": "112380744861484895128",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/theropybot%40therapybot-nw9n.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
