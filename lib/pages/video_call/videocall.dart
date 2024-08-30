@@ -1,7 +1,7 @@
 import 'package:agora_token_service/agora_token_service.dart';
 import 'package:agora_uikit/agora_uikit.dart';
 import 'package:flutter/material.dart';
-import 'package:newproject/pages/video_call/token_generator.dart';
+import 'package:mind_healer/pages/video_call/token_generator.dart';
 
 class VideoCall extends StatefulWidget {
   final String channelName;

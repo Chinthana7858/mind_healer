@@ -1,11 +1,9 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/pages/user/make_appointment.dart';
-import 'package:newproject/service/FirestoreService.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/pages/user/make_appointment.dart';
+import 'package:mind_healer/service/FirestoreService.dart';
 
 class PsychiatristProfile extends StatefulWidget {
   const PsychiatristProfile({super.key, required this.psychiatristId});
@@ -26,6 +24,9 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
   String _psychiatristEmail = '';
   String? _psychiatristSpeciality;
   List<String> _favoritePsychiatrists = [];
+  Map<String, dynamic> _availabilityStartTimes = {};
+  Map<String, dynamic> _availabilityEndTimes = {};
+
   @override
   void initState() {
     super.initState();
@@ -78,7 +79,14 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
               ? data!['speciality']
               : null;
 
-          print(_psychiatristProfileUrl);
+          // Fetch availability data
+          var availability = data?['availability'] as Map<String, dynamic>?;
+          if (availability != null) {
+            _availabilityStartTimes =
+                availability['startTimes'] as Map<String, dynamic>;
+            _availabilityEndTimes =
+                availability['endTimes'] as Map<String, dynamic>;
+          }
         });
       }
     } catch (e) {
@@ -171,8 +179,7 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
                           children: [
                             Text(
                               'Dr $_psychiatristName',
-                              textAlign: TextAlign
-                                  .center, // Center align text horizontally
+                              textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -181,8 +188,7 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
                             ),
                             Text(
                               _psychiatristQualification,
-                              textAlign: TextAlign
-                                  .center, // Center align text horizontally
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey.shade900,
@@ -191,8 +197,7 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
                             _psychiatristSpeciality != null
                                 ? Text(
                                     _psychiatristSpeciality!,
-                                    textAlign: TextAlign
-                                        .center, // Center align text horizontally
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.grey.shade900,
@@ -201,8 +206,7 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
                                 : Container(),
                             Text(
                               _psychiatristEmail,
-                              textAlign: TextAlign
-                                  .center, // Center align text horizontally
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey.shade900,
@@ -210,6 +214,93 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
                             ),
                           ],
                         ),
+                      ),
+
+                      // Display availability
+                      const SizedBox(height: 16.0),
+                      Text(
+                        'Availability',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: primegreen,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8.0),
+                      Table(
+                        border: TableBorder.all(color: Colors.grey),
+                        children: [
+                          TableRow(
+                            children: [
+                              TableCell(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Day',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: primegreen,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'From',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: primegreen,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'To',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: primegreen,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          ..._availabilityStartTimes.entries.map((entry) {
+                            String day = entry.key;
+                            String startTime = entry.value;
+                            String endTime =
+                                _availabilityEndTimes[day] ?? 'Unavailable';
+
+                            return TableRow(
+                              children: [
+                                TableCell(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(day),
+                                  ),
+                                ),
+                                TableCell(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(startTime),
+                                  ),
+                                ),
+                                TableCell(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(endTime),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        ],
                       ),
 
                       Center(
@@ -256,8 +347,7 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => MakeAppointment(
-                                        psychiatristId:
-                                            widget.psychiatristId.toString())),
+                                        psychiatristId: widget.psychiatristId)),
                               );
                             },
                             child: const Row(

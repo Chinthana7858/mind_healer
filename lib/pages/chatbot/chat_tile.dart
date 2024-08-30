@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:newproject/const/colors.dart';
+import 'package:mind_healer/const/colors.dart';
 
 class ChatTile extends StatelessWidget {
   final Widget child;

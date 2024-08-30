@@ -5,10 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:newproject/pages/psychiatrist/psychiatrist_bottom_nav_bar.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/const/styles.dart';
-import 'package:newproject/pages/user/user_bottom_nav_bar.dart';
+import 'package:mind_healer/pages/psychiatrist/psychiatrist_bottom_nav_bar.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/const/styles.dart';
+import 'package:mind_healer/pages/user/user_bottom_nav_bar.dart';
 import 'package:image/image.dart' as img;
 
 class SignupPage extends StatefulWidget {
@@ -36,6 +36,9 @@ class _SignupPageState extends State<SignupPage> {
   bool _isLoading = false;
   File? _image;
 
+  Map<String, String> _startTimes = {};
+  Map<String, String> _endTimes = {};
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ImagePicker _picker = ImagePicker();
@@ -61,6 +64,18 @@ class _SignupPageState extends State<SignupPage> {
     });
 
     try {
+      // Check if the profile picture is mandatory and selected for psychiatrists
+      if (_isPsychiatrist && _image == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Profile picture is mandatory for psychiatrists.')),
+        );
+        return;
+      }
+
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: _emailController.text,
@@ -69,7 +84,6 @@ class _SignupPageState extends State<SignupPage> {
 
       // Determine the collection based on the user type
       String collection = _isPsychiatrist ? 'psychiatrists' : 'users';
-      print("trying1");
 
       // Prepare user data
       Map<String, dynamic> userData = {
@@ -90,12 +104,16 @@ class _SignupPageState extends State<SignupPage> {
         if (_isSpecialist) {
           userData['speciality'] = _specialityController.text;
         }
+
+        // Add availability data
+        userData['availability'] = {
+          'startTimes': _startTimes,
+          'endTimes': _endTimes,
+        };
       }
-      print("trying2");
+
       // Upload profile picture if selected
       if (_image != null) {
-        print("trying3");
-        print(userCredential.user!.uid);
         String imageUrl = await uploadProfilePicture(userCredential.user!.uid);
         userData['profilePicture'] = imageUrl;
       }
@@ -208,6 +226,89 @@ class _SignupPageState extends State<SignupPage> {
 
     return null;
   }
+
+  Widget _buildAvailabilityField(String day) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Table(
+        columnWidths: const {
+          0: FlexColumnWidth(2),
+          1: FlexColumnWidth(2),
+          2: FlexColumnWidth(2),
+        },
+        children: [
+          TableRow(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                child: Text(
+                  day,
+                  style: const TextStyle(color: primegreen, fontSize: 16),
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  TimeOfDay? selectedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  if (selectedTime != null) {
+                    setState(() {
+                      _startTimes[day] = selectedTime.format(context);
+                    });
+                  }
+                },
+                child: AbsorbPointer(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 10.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Text(
+                      _startTimes[day] ?? 'Start Time',
+                      style: const TextStyle(
+                          fontSize: 16.0, color: Colors.black54),
+                    ),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  TimeOfDay? selectedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  if (selectedTime != null) {
+                    setState(() {
+                      _endTimes[day] = selectedTime.format(context);
+                    });
+                  }
+                },
+                child: AbsorbPointer(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 10.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Text(
+                      _endTimes[day] ?? 'End Time',
+                      style: const TextStyle(
+                          fontSize: 16.0, color: Colors.black54),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -385,6 +486,17 @@ class _SignupPageState extends State<SignupPage> {
                 SizedBox(
                   height: screenHeight * 0.01,
                 ),
+                const Text(
+                  'Enter your availability here',
+                  style: TextStyle(color: primegreen),
+                ),
+                _buildAvailabilityField('Sunday'),
+                _buildAvailabilityField('Monday'),
+                _buildAvailabilityField('Tuesday'),
+                _buildAvailabilityField('Wednesday'),
+                _buildAvailabilityField('Thursday'),
+                _buildAvailabilityField('Friday'),
+                _buildAvailabilityField('Saturday'),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

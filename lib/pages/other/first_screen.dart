@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:newproject/const/colors.dart';
-import 'package:newproject/const/styles.dart';
+import 'package:mind_healer/const/colors.dart';
+import 'package:mind_healer/const/styles.dart';
 
 class FirstScreen extends StatefulWidget {
   const FirstScreen({super.key});
