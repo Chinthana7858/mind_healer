@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mind_healer/const/colors.dart';
 import 'package:mind_healer/const/styles.dart';
-import 'package:mind_healer/pages/chatbot/chat.dart';
+import 'package:mind_healer/pages/chatbot/Dialogflow/chat_screen.dart';
 import 'package:mind_healer/pages/user/psychiatrist_profile.dart';
 import 'package:mind_healer/pages/user/user_profile_edit.dart';
 import 'package:mind_healer/service/FirestoreService.dart';
@@ -185,7 +185,7 @@ class _UserHomePageState extends State<UserHomePage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const ChatPage()),
+                                      builder: (context) => const DfChat()),
                                 );
                               },
                               style: ButtonStyle(
