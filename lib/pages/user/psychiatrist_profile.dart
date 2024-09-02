@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mind_healer/const/colors.dart';
 import 'package:mind_healer/pages/user/make_appointment.dart';
+import 'package:mind_healer/pages/user/make_appointment_by_time.dart';
 import 'package:mind_healer/service/FirestoreService.dart';
 
 class PsychiatristProfile extends StatefulWidget {
@@ -17,7 +18,7 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirestoreService _firestoreService = FirestoreService();
-  // Variables to hold psychiatrist details
+
   String _psychiatristName = '';
   String _psychiatristQualification = '';
   String _psychiatristProfileUrl = '';
@@ -30,7 +31,6 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
   @override
   void initState() {
     super.initState();
-    // Fetch psychiatrist details when the widget initializes
     _fetchPsychiatristDetails();
   }
 
@@ -79,7 +79,6 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
               ? data!['speciality']
               : null;
 
-          // Fetch availability data
           var availability = data?['availability'] as Map<String, dynamic>?;
           if (availability != null) {
             _availabilityStartTimes =
@@ -98,6 +97,17 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     final user = _auth.currentUser;
+
+    // Define the correct order of the days
+    final List<String> orderedDays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -156,7 +166,6 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
                                   height: screenWidth * 0.5,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
-                                    // Show a placeholder image or alternative UI for image load errors
                                     return Image.asset(
                                       'assets/images/default_profile.png',
                                       width: screenWidth * 0.5,
@@ -269,11 +278,24 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
                                   ),
                                 ),
                               ),
+                              TableCell(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    '',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: primegreen,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
-                          ..._availabilityStartTimes.entries.map((entry) {
-                            String day = entry.key;
-                            String startTime = entry.value;
+                          // Iterate through orderedDays to ensure correct order
+                          ...orderedDays.map((day) {
+                            String startTime =
+                                _availabilityStartTimes[day] ?? 'Unavailable';
                             String endTime =
                                 _availabilityEndTimes[day] ?? 'Unavailable';
 
@@ -297,71 +319,39 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
                                     child: Text(endTime),
                                   ),
                                 ),
+                                TableCell(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                MakeAppointmentByTime(
+                                              psychiatristId:
+                                                  widget.psychiatristId,
+                                              startTime: startTime,
+                                              endTime: endTime,
+                                              day: day,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: const Icon(
+                                        Icons.arrow_circle_right_rounded,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ],
                             );
                           }).toList(),
                         ],
                       ),
-
-                      Center(
-                        child: SizedBox(
-                          width: screenWidth * 0.7,
-                          child: IconButton(
-                            icon: _favoritePsychiatrists
-                                    .contains(widget.psychiatristId)
-                                ? const Icon(
-                                    Icons.favorite,
-                                    color: primegreen,
-                                  )
-                                : const Icon(
-                                    Icons.favorite_border,
-                                    color: primegreen,
-                                  ),
-                            onPressed: () {
-                              _toggleFavorite(widget.psychiatristId);
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16.0),
-                      Center(
-                        child: SizedBox(
-                          width: screenWidth * 0.7,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: primegreen,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                              ),
-                              shadowColor: primegreen,
-                              textStyle: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MakeAppointment(
-                                        psychiatristId: widget.psychiatristId)),
-                              );
-                            },
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Make an appointment',
-                                  style: TextStyle(fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                      SizedBox(
+                        height: 100,
                       )
                     ],
                   ),
@@ -369,9 +359,19 @@ class _PsychiatristProfileState extends State<PsychiatristProfile> {
               ),
             );
           } else {
-            return const Center(child: Text('No data available.'));
+            return const Center(child: Text('No data available'));
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _toggleFavorite(widget.psychiatristId),
+        backgroundColor: primegreen,
+        child: Icon(
+          _favoritePsychiatrists.contains(widget.psychiatristId)
+              ? Icons.favorite
+              : Icons.favorite_border,
+          color: Colors.white,
+        ),
       ),
     );
   }
