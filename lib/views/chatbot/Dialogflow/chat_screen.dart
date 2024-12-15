@@ -1,5 +1,6 @@
 import 'package:dialog_flowtter/dialog_flowtter.dart';
 import 'package:flutter/material.dart';
+import 'package:mind_healer/const/colors.dart';
 import 'package:path/path.dart' as p; // Use alias for path context if needed
 import 'package:sqflite/sqflite.dart';
 
@@ -103,7 +104,9 @@ class _HomeState extends State<DfChat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: coolgray,
       appBar: AppBar(
+        backgroundColor: coolgray,
         title: const Text('AI Assistant'),
         actions: [
           IconButton(

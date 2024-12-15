@@ -71,7 +71,9 @@ class _UserHomePageState extends State<UserHomePage> {
     final User? user = FirebaseAuth.instance.currentUser;
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: coolgray,
       appBar: AppBar(
+        backgroundColor: coolgray,
         title: user != null
             ? FutureBuilder<Map<String, dynamic>?>(
                 future: _firestoreService.getUserData(user.uid),
@@ -286,9 +288,20 @@ class _UserHomePageState extends State<UserHomePage> {
                                     userData['name'] != null
                                         ? 'DR. ${userData['name']}'
                                         : 'Name not available',
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromARGB(255, 106, 106, 106),
+                                    ),
                                   ),
-                                  subtitle:
-                                      Text(userData['qualification'] ?? ''),
+                                  subtitle: Text(
+                                    userData['qualification'] ?? '',
+                                    style: TextStyle(
+                                      fontSize: 13.0,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff555555),
+                                    ),
+                                  ),
                                   trailing: ElevatedButton(
                                     onPressed: () {
                                       Navigator.push(
@@ -374,9 +387,20 @@ class _UserHomePageState extends State<UserHomePage> {
                                     userData['name'] != null
                                         ? 'DR. ${userData['name']}'
                                         : 'Name not available',
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromARGB(255, 106, 106, 106),
+                                    ),
                                   ),
-                                  subtitle:
-                                      Text(userData['qualification'] ?? ''),
+                                  subtitle: Text(
+                                    userData['qualification'] ?? '',
+                                    style: TextStyle(
+                                      fontSize: 13.0,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff555555),
+                                    ),
+                                  ),
                                   trailing: ElevatedButton(
                                     onPressed: () {
                                       Navigator.push(

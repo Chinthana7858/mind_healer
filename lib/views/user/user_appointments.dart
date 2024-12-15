@@ -38,12 +38,13 @@ class _UserAppointmentsState extends State<UserAppointments> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: coolgray,
       appBar: AppBar(
         title: const Text(
           'My Appointments',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
             color: primegreen,
           ),
         ),
@@ -150,7 +151,9 @@ class _UserAppointmentsState extends State<UserAppointments> {
         DateTime? endingDateTime = endingTimestamp?.toDate();
 
         return Card(
-          margin: const EdgeInsets.all(8.0),
+          margin: const EdgeInsets.all(12.0),
+          borderOnForeground: true,
+          color: secondarygreen,
           child: ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
@@ -162,16 +165,59 @@ class _UserAppointmentsState extends State<UserAppointments> {
                 ),
               ),
             ),
-            title: Text('Dr. $psychiatristName'),
+            title: Text(
+              'Dr. $psychiatristName',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 16.0,
+                fontWeight: FontWeight.w700,
+                color: Color.fromARGB(255, 65, 120, 118),
+                letterSpacing: 0.5,
+              ),
+            ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                    'Date: ${startingDateTime != null ? DateFormat('MMMM d, y').format(startingDateTime) : 'N/A'}'),
+                  'Date: ${startingDateTime != null ? DateFormat('MMMM d, y').format(startingDateTime) : 'N/A'}',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w500,
+                    color: Color.fromARGB(255, 65, 120, 118),
+                    letterSpacing: 0.5,
+                  ),
+                ),
                 Text(
-                    'Starting Time: ${startingDateTime != null ? DateFormat(' h:mm a').format(startingDateTime) : 'N/A'}'),
-                Text('Ending Time: ${data['EndingTime'] ?? 'N/A'}'),
-                Text((data['isApproved'] ?? false) ? 'Confirmed' : 'Pending'),
+                  'Starting Time: ${startingDateTime != null ? DateFormat(' h:mm a').format(startingDateTime) : 'N/A'}',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w500,
+                    color: Color.fromARGB(255, 65, 120, 118),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  'Ending Time: ${data['EndingTime'] ?? 'N/A'}',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w500,
+                    color: Color.fromARGB(255, 65, 120, 118),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  (data['isApproved'] ?? false) ? 'Confirmed' : 'Pending',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w500,
+                    color: Color.fromARGB(255, 65, 120, 118),
+                    letterSpacing: 0.5,
+                  ),
+                ),
                 TextButton(
                   onPressed: () {
                     _showDeleteConfirmationDialog(appointment.id);
@@ -208,26 +254,27 @@ class _UserAppointmentsState extends State<UserAppointments> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  VideoCall(channelName: appointmentId,)),
+                              builder: (context) => VideoCall(
+                                    channelName: appointmentId,
+                                  )),
                         );
                       },
                     )
                   else
                     Icon(
                       Icons.videocam_off,
-                      color: Colors.teal.shade200,
+                      color: Colors.teal,
                       size: 40,
                     )
                 else
                   TextButton(
                     onPressed: null,
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.teal.shade100,
+                      backgroundColor: Colors.white,
                     ),
                     child: const Text(
                       'Pending',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: primegreen),
                     ),
                   ),
               ],

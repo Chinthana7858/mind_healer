@@ -25,6 +25,7 @@ class _UserBottomBarState extends State<UserBottomBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: coolgray,
         body: _getPage(_selectedIndex),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
@@ -75,7 +76,7 @@ class _UserBottomBarState extends State<UserBottomBar> {
   Widget _getPage(int index) {
     switch (index) {
       case 0:
-        return  UserHomePage();
+        return UserHomePage();
       case 1:
         return const FavoriteDoctors();
       case 2:

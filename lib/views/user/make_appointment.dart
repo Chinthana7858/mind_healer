@@ -140,15 +140,70 @@ class _MakeAppointmentState extends State<MakeAppointment> {
             .collection('appointments')
             .add(appointmentData);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Appointment made successfully!')));
-        Navigator.pop(context);
+        // Show a success popup
+        _showPopupDialog(
+          title: 'Success',
+          message: 'Appointment made successfully!',
+          icon: Icons.check_circle,
+          color: primegreen,
+        );
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pop(context);
+        });
       } catch (e) {
         print('Error submitting form: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to make appointment')));
+
+        // Show an error popup
+        _showPopupDialog(
+          title: 'Error',
+          message: 'Failed to make appointment.',
+          icon: Icons.error,
+          color: Colors.red,
+        );
       }
     }
+  }
+
+// Function to display a popup dialog
+  void _showPopupDialog({
+    required String title,
+    required String message,
+    required IconData icon,
+    required Color color,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: coolgray,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Row(
+            children: [
+              Icon(icon, color: color, size: 28),
+              SizedBox(width: 10),
+              Text(title, style: TextStyle(fontWeight: FontWeight.w400)),
+            ],
+          ),
+          content: Text(
+            message,
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'OK',
+                style:
+                    TextStyle(color: primegreen, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
