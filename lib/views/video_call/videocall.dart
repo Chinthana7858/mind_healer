@@ -1,7 +1,8 @@
 import 'package:agora_token_service/agora_token_service.dart';
 import 'package:agora_uikit/agora_uikit.dart';
 import 'package:flutter/material.dart';
-import 'package:mind_healer/pages/video_call/token_generator.dart';
+import 'package:mind_healer/const/agora_credentials.dart';
+import 'package:mind_healer/service/token_generator.dart';
 
 class VideoCall extends StatefulWidget {
   final String channelName;
@@ -13,9 +14,8 @@ class VideoCall extends StatefulWidget {
 
 class _VideoCallState extends State<VideoCall> {
   AgoraClient? client;
-  final String appId = 'd1bb63db7a5e4d8ba9cd2a341c0f5771';
-  final String appCertificate = 'eb4aa05c2fce440c9624e4bc08d1942f';
-  final String channelName = 'test';
+  final String appId = AgoraCredentials.appId;
+  final String appCertificate = AgoraCredentials.appCertificate;
   final int uid = 0; // Use 0 if you do not use a specific user ID
   final RtcRole role = RtcRole.publisher;
 
@@ -29,7 +29,7 @@ class _VideoCallState extends State<VideoCall> {
     final token = generateAgoraToken(
       appId: appId,
       appCertificate: appCertificate,
-      channelName: channelName,
+      channelName: widget.channelName,
       uid: '0',
       role: role,
     );
@@ -38,7 +38,7 @@ class _VideoCallState extends State<VideoCall> {
       client = AgoraClient(
         agoraConnectionData: AgoraConnectionData(
           appId: appId,
-          channelName: channelName,
+          channelName: widget.channelName,
           tempToken: token,
         ),
         enabledPermission: [

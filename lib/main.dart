@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'package:mind_healer/auth/authwrapper.dart';
-import 'package:mind_healer/pages/user/user_home_page.dart';
-import 'package:mind_healer/pages/other/signin_page.dart';
-import 'package:mind_healer/pages/other/signup_page.dart';
+import 'package:mind_healer/views/user/user_home_page.dart';
+import 'package:mind_healer/views/auth/signin_page.dart';
+import 'package:mind_healer/views/auth/signup_page.dart';
+import 'package:mind_healer/viewmodels/user_profile_viewmodel.dart'; // Import your ViewModel
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,20 +18,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProfileViewModel()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const AuthWrapper(),
+          '/signin': (context) => const SigninPage(),
+          '/userhomepage': (context) => UserHomePage(),
+          '/signuppage': (context) => const SignupPage(),
+          '/signinpage': (context) => const SigninPage(),
+        },
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const AuthWrapper(),
-        '/signin': (context) => const SigninPage(),
-        '/userhomepage': (context) => UserHomePage(),
-        '/signuppage': (context) => const SignupPage(),
-        '/signinpage': (context) => const SigninPage(),
-      },
     );
   }
 }
