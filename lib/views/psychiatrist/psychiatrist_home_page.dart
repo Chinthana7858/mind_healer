@@ -5,9 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mind_healer/const/colors.dart';
-import 'package:mind_healer/pages/user/user_profile.dart';
+import 'package:mind_healer/views/user/user_profile_page.dart';
 import 'package:mind_healer/service/FirestoreService.dart';
-import 'package:mind_healer/pages/video_call/videocall.dart';
+import 'package:mind_healer/views/video_call/videocall.dart';
 
 class PsychiatristHomePage extends StatefulWidget {
   const PsychiatristHomePage({super.key});
@@ -324,9 +324,7 @@ class _PsychiatristHomePageState extends State<PsychiatristHomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => VideoCall(
-                                      channelName: appointmentId,
-                                    )),
+                                builder: (context) => VideoCall(channelName: appointmentId,)),
                           );
                         },
                       )

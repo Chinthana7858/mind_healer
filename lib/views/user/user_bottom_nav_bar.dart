@@ -1,20 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mind_healer/const/colors.dart';
-import 'package:mind_healer/pages/psychiatrist/psychiatrist_profile.dart';
-import 'package:mind_healer/pages/psychiatrist/psychiatrist_home_page.dart';
+import 'package:mind_healer/views/user/favourite_doctors.dart';
+import 'package:mind_healer/views/user/user_home_page.dart';
+import 'package:mind_healer/views/user/user_appointments.dart';
 
-class PsyBottomBar extends StatefulWidget {
-  const PsyBottomBar({super.key, required this.selectedIndex});
+class UserBottomBar extends StatefulWidget {
+  const UserBottomBar({super.key, required this.selectedIndex});
 
   final int selectedIndex;
 
   @override
-  State<PsyBottomBar> createState() => _PsyBottomBarState();
+  State<UserBottomBar> createState() => _UserBottomBarState();
 }
 
-class _PsyBottomBarState extends State<PsyBottomBar> {
- // final FirebaseAuth _auth = FirebaseAuth.instance;
+class _UserBottomBarState extends State<UserBottomBar> {
   late int _selectedIndex;
 
   @override
@@ -28,14 +27,14 @@ class _PsyBottomBarState extends State<PsyBottomBar> {
     return Scaffold(
         body: _getPage(_selectedIndex),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        // floatingActionButton: FloatingActionButton(
-        //   shape: const CircleBorder(),
-        //   onPressed: () => _onNavItemPressed(1),
-        //   backgroundColor: Colors.amber,
-        //   foregroundColor: Colors.white,
-        //   elevation: 0,
-        //   child: const Icon(Icons.home),
-        // ),
+        floatingActionButton: FloatingActionButton(
+          shape: const CircleBorder(),
+          onPressed: () => _onNavItemPressed(0),
+          backgroundColor: primegreen,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          child: const Icon(Icons.home),
+        ),
         bottomNavigationBar: ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20.0)),
           child: BottomAppBar(
@@ -48,16 +47,16 @@ class _PsyBottomBarState extends State<PsyBottomBar> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 IconButton(
-                  onPressed: () => _onNavItemPressed(0),
+                  onPressed: () => _onNavItemPressed(1),
                   icon: const Icon(
-                    Icons.home,
+                    Icons.people,
                     color: Colors.white,
                   ),
                 ),
                 IconButton(
-                  onPressed: () => _onNavItemPressed(1),
+                  onPressed: () => _onNavItemPressed(2),
                   icon: const Icon(
-                    Icons.person,
+                    Icons.event,
                     color: Colors.white,
                   ),
                 ),
@@ -74,12 +73,13 @@ class _PsyBottomBarState extends State<PsyBottomBar> {
   }
 
   Widget _getPage(int index) {
-    final User? user = FirebaseAuth.instance.currentUser;
     switch (index) {
       case 0:
-        return const PsychiatristHomePage();
+        return  UserHomePage();
       case 1:
-        return PsychiatristProfileEditPage(userId: user!.uid);
+        return const FavoriteDoctors();
+      case 2:
+        return const UserAppointments();
       default:
         return Container();
     }

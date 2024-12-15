@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:mind_healer/const/colors.dart';
 import 'package:mind_healer/service/FirestoreService.dart';
-import 'package:mind_healer/pages/video_call/videocall.dart';
+import 'package:mind_healer/views/video_call/videocall.dart';
 
 class UserAppointments extends StatefulWidget {
   const UserAppointments({super.key});
@@ -209,7 +209,7 @@ class _UserAppointmentsState extends State<UserAppointments> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  VideoCall(channelName: appointmentId)),
+                                  VideoCall(channelName: appointmentId,)),
                         );
                       },
                     )

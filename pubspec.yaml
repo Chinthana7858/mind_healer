@@ -41,6 +41,7 @@ dependencies:
   uuid: ^4.4.0
   file_picker: ^8.0.6
   dialog_flowtter: ^0.3.3
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:

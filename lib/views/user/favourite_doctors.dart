@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mind_healer/const/colors.dart';
-import 'package:mind_healer/pages/user/psychiatrist_profile.dart';
+import 'package:mind_healer/views/psychiatrist/psychiatrist_profile.dart';
 import 'package:mind_healer/service/FirestoreService.dart';
 
 class FavoriteDoctors extends StatefulWidget {
@@ -50,7 +50,6 @@ class _FavoriteDoctorsState extends State<FavoriteDoctors> {
 
   @override
   Widget build(BuildContext context) {
- 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -136,7 +135,7 @@ class _FavoriteDoctorsState extends State<FavoriteDoctors> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => PsychiatristProfile(
+                                  builder: (context) => PsychiatristProfilePage(
                                       psychiatristId:
                                           psychiatristId.toString())),
                             );

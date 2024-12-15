@@ -5,9 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mind_healer/const/colors.dart';
 import 'package:mind_healer/const/styles.dart';
-import 'package:mind_healer/pages/chatbot/Dialogflow/chat_screen.dart';
-import 'package:mind_healer/pages/user/psychiatrist_profile.dart';
-import 'package:mind_healer/pages/user/user_profile_edit.dart';
+import 'package:mind_healer/views/chatbot/Dialogflow/chat_screen.dart';
+import 'package:mind_healer/views/psychiatrist/psychiatrist_profile.dart';
+import 'package:mind_healer/views/user/user_profile_edit.dart';
 import 'package:mind_healer/service/FirestoreService.dart';
 
 class UserHomePage extends StatefulWidget {
@@ -295,7 +295,7 @@ class _UserHomePageState extends State<UserHomePage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                PsychiatristProfile(
+                                                PsychiatristProfilePage(
                                                     psychiatristId:
                                                         userData['userId']
                                                             .toString())),
@@ -383,7 +383,7 @@ class _UserHomePageState extends State<UserHomePage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                PsychiatristProfile(
+                                                PsychiatristProfilePage(
                                                     psychiatristId:
                                                         userData['userId']
                                                             .toString())),
@@ -424,7 +424,7 @@ class _UserHomePageState extends State<UserHomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => PsychiatristProfile(
+                              builder: (context) => PsychiatristProfilePage(
                                   psychiatristId: userData['userId'])),
                         );
                       },
