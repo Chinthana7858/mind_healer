@@ -39,8 +39,10 @@ class _FirstScreenState extends State<FirstScreen> {
             ),
           ),
           const Center(
+              child: Padding(
+            padding: EdgeInsets.all(10),
             child: Text(
-              'Application to diagnose patients’ mental disorders and give instructions to solve them with artificial intelligence techniques.',
+              'An application for patients with mental health disorders, offering appointment scheduling, AI-powered chat support, and live video sessions.',
               style: TextStyle(
                 fontSize: 16.0,
                 color: Colors.black87,
@@ -50,9 +52,9 @@ class _FirstScreenState extends State<FirstScreen> {
               overflow: TextOverflow.ellipsis,
               maxLines: 4,
             ),
-          ),
+          )),
           SizedBox(
-            height: screenHeight * 0.15,
+            height: screenHeight * 0.1,
           ),
           SizedBox(
             width: screenWidth * 0.7,

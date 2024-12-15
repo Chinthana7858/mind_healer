@@ -51,7 +51,9 @@ class _FavoriteDoctorsState extends State<FavoriteDoctors> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: coolgray,
       appBar: AppBar(
+        backgroundColor: coolgray,
         title: const Text(
           'Favourite Psychiatrists',
           style: TextStyle(

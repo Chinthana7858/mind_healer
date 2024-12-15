@@ -8,7 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mind_healer/views/widgets/psychiatrist_bottom_nav_bar.dart';
 import 'package:mind_healer/const/colors.dart';
 import 'package:mind_healer/const/styles.dart';
-import 'package:mind_healer/views/user/user_bottom_nav_bar.dart';
+import 'package:mind_healer/views/widgets/user_bottom_nav_bar.dart';
 import 'package:image/image.dart' as img;
 
 class SignupPage extends StatefulWidget {

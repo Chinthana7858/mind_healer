@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mind_healer/views/widgets/psychiatrist_bottom_nav_bar.dart';
 import 'package:mind_healer/const/colors.dart'; // Assuming you have defined primegreen color
 import 'package:mind_healer/const/styles.dart';
-import 'package:mind_healer/views/user/user_bottom_nav_bar.dart'; // Assuming you have ScreenSize class defined
+import 'package:mind_healer/views/widgets/user_bottom_nav_bar.dart'; // Assuming you have ScreenSize class defined
 
 class SigninPage extends StatefulWidget {
   const SigninPage({super.key});
