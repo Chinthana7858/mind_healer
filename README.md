@@ -1,4 +1,4 @@
-# newproject
+# Mind Healer
 
 A new Flutter project.
 
